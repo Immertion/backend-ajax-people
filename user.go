@@ -1,9 +1,9 @@
 package user
 
 type User struct {
-	Id        int    `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	Id        int    `json:"-" db:"id"`
+	FirstName string `json:"firstName" binding:"required"`
+	LastName  string `json:"lastName" binding:"required"`
 	//Age            int       `json:"age"`
 	//Mail           string    `json:"mail"`
 	//StatusUser     string    `json:"statusUser"`

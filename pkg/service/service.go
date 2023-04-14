@@ -1,16 +1,16 @@
 package service
 
-import "backend_ajax-people/pkg/repository"
+import (
+	user "backend_ajax-people"
+	"backend_ajax-people/pkg/repository"
+)
 
 type Authorization interface {
-}
-
-type TodoUser interface {
+	CreateUser(user user.User) (int, error)
 }
 
 type Service struct {
 	Authorization
-	TodoUser
 }
 
 func NewService(repos *repository.Repository) *Service {

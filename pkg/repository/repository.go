@@ -1,16 +1,20 @@
 package repository
 
-type Authorization interface {
-}
+import (
+	user "backend_ajax-people"
+	"github.com/jmoiron/sqlx"
+)
 
-type TodoUser interface {
+type Authorization interface {
+	CreateUser(user user.User) (int, error)
 }
 
 type Repository struct {
 	Authorization
-	TodoUser
 }
 
-func NewRepository() *Repository {
-	return &Repository{}
+func NewRepository(db *sqlx.DB) *Repository {
+	return &Repository{
+		Authorization: NewAuthPostgres(db),
+	}
 }
