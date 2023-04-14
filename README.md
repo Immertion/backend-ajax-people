@@ -1,1 +1,6 @@
-# backend проекта ajax-people
+# Сервер аякс.люди
+
+## Запуск проекта
+```cmd
+go run .\cmd\main.go
+```
