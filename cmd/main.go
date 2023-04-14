@@ -14,8 +14,12 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
+	const port = "8080"
+
 	srv := new(user.Server)
-	if err := srv.Run(("8080"), handlers.InitRoutes()); err != nil {
+	if err := srv.Run(port, handlers.InitRoutes()); err != nil {
 		log.Fatalf("error occured while ruunning http server: %s", err.Error())
 	}
+
+	log.Printf("Server is running on port %s", port)
 }
