@@ -9,20 +9,31 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"log"
 )
+
+func initConfig() error {
+	viper.AddConfigPath("config")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
+}
 
 func main() {
 
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
+	if err := initConfig(); err != nil {
+		logrus.Fatalf("error initializing configs: %s", err.Error())
+	}
+
 	db, err := repository.NewPostgresDB(repository.Config{
-		Host:     "localhost",
-		Port:     "32769",
-		Username: "postgres",
-		DBName:   "userdb",
-		Password: "postgrespw",
-		SSLMode:  "disable",
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		DBName:   viper.GetString("db.dbname"),
+		Password: viper.GetString("db.password"),
+		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
 		fmt.Printf("failed to initialize db: %s", err.Error())
@@ -33,7 +44,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(user.Server)
-	if err := srv.Run(("8080"), handlers.InitRoutes()); err != nil {
+	if err := srv.Run((viper.GetString("port")), handlers.InitRoutes()); err != nil {
 		log.Fatalf("error occured while ruunning http server: %s", err.Error())
 	}
 

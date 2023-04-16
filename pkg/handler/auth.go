@@ -8,15 +8,15 @@ import (
 )
 
 func (h *Handler) signUp(c *gin.Context) {
-	var reqUser user.User
+	var input user.User
 
-	if err := c.BindJSON(&reqUser); err != nil {
+	if err := c.BindJSON(&input); err != nil {
 		fmt.Printf("Failed to create a user: %s\n", err.Error())
 		c.JSON(http.StatusBadRequest, "Failed to create a user")
 		return
 	}
 
-	id, err := h.services.Authorization.CreateUser(reqUser)
+	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil {
 		fmt.Printf("Failed data: %s\n", err.Error())
 		return
@@ -28,5 +28,20 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
+	var input signInInput
 
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	token, err := h.services.Authorization.GenerateToken(input.Firstname, input.Password)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"token": token,
+	})
 }
