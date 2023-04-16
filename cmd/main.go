@@ -48,7 +48,7 @@ func main() {
 		log.Fatalf("error occured while ruunning http server: %s", err.Error())
 	}
 
-	logrus.Print("TodoApp Started")
+	logrus.Print("WebSite Started")
 
 	if err := srv.Shutdown(context.Background()); err != nil {
 		logrus.Errorf("error occured on server shutting down: %s", err.Error())

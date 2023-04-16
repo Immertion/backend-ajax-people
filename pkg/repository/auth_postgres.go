@@ -20,7 +20,7 @@ func (r *AuthPostgres) CreateUser(user user.User) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (firstname, lastname, password) values ($1, $2, $3) RETURNING id", "users")
 
 	row := r.db.QueryRow(query, user.FirstName, user.LastName, user.Password)
-	fmt.Println(query)
+	fmt.Println(user.LastName)
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
