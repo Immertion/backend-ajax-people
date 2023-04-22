@@ -26,9 +26,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.POST("/", h.createUser)
 			users.GET("/", h.getAllUsers)
 			users.GET("/:id", h.getUserById)
-			users.DELETE("/:id", h.updateUser)
-			users.PUT("/:id", h.deleteUser)
+			users.DELETE("/:id", h.deleteUser)
+			users.PUT("/:id", h.updateUser)
 		}
+		api.POST("/mail", h.sendMessageMail)
 	}
 	return router
 }
