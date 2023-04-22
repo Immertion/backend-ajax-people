@@ -2,6 +2,7 @@ package handler
 
 import (
 	"backend_ajax-people/pkg/service"
+
 	"github.com/gin-gonic/gin"
 )
 
