@@ -4,8 +4,9 @@ import (
 	user "backend_ajax-people"
 	"container/list"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) createUser(c *gin.Context) {
@@ -81,10 +82,12 @@ func (h *Handler) updateUser(c *gin.Context) {
 
 func (h *Handler) deleteUser(c *gin.Context) {
 	userId, err := getUserId(c)
+
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	err = h.services.DeleteUser(userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -92,21 +95,21 @@ func (h *Handler) deleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, err)
-
 }
 
 type Message struct {
-	message string `json:"message" binding:"required,message"`
+	Content string `json:"content" binding:"required"`
 }
 
 func (h *Handler) sendMessageMail(c *gin.Context) {
 	var message Message
 
 	if err := c.BindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, "Failed send message")
+		c.JSON(http.StatusBadRequest, "failed to send a message")
 		return
 	}
-	fmt.Println(message.message)
+
+	fmt.Println(message.Content)
 
 	//_, _, err := h.services.SendMessage(message, "token")
 	//if err != nil {
@@ -114,5 +117,5 @@ func (h *Handler) sendMessageMail(c *gin.Context) {
 	//	return
 	//}
 
-	c.JSON(http.StatusOK, message)
+	c.JSON(http.StatusOK, message.Content)
 }
