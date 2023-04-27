@@ -35,9 +35,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			}
 		}
 
+		registerData := api.Group("/register-data")
+
 		faculty := apiPublic.Group("/faculty")
 		{
-			faculty.GET("/", h.getAllFaculties)
+			registerData.GET("/faculties", h.getAllFaculties)
+			registerData.GET("/interests", h.getAllInterests)
+			registerData.GET("/user-statuses", h.getAllStatuses)
+			registerData.GET("/education-levels", h.getAllEdLevels)
+			registerData.GET("/schools", h.getAllSchools)
 		}
 	}
 
