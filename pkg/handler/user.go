@@ -7,7 +7,41 @@ import (
 	"net/http"
 )
 
+func checkAdmin(h *Handler, c *gin.Context) bool {
+	token, err := c.Cookie("jwtToken")
+	if err != nil {
+		return false
+	}
+
+	_, isAdmin, err := h.services.ParseToken(token)
+	if err != nil {
+		return false
+	}
+
+	return isAdmin
+}
+
+func getJWT(h *Handler, c *gin.Context) (int, bool, error) {
+	token, err := c.Cookie("jwtToken")
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return 0, false, err
+	}
+
+	userId, isAdmin, err := h.services.ParseToken(token)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return 0, false, err
+	}
+
+	return userId, isAdmin, nil
+}
+
 func (h *Handler) createUser(c *gin.Context) {
+	if checkAdmin(h, c) == false {
+		c.JSON(http.StatusForbidden, "Forbidden")
+		return
+	}
 	var input user.User
 
 	if err := c.BindJSON(&input); err != nil {
@@ -38,14 +72,19 @@ func (h *Handler) getAllUsers(c *gin.Context) {
 }
 
 func (h *Handler) getUserById(c *gin.Context) {
-	userId, err := getUserId(c)
+	userId, isAdmin, err := getJWT(h, c)
+	getId, err := getUserId(c)
+	if isAdmin == false || userId != getId {
+		c.JSON(http.StatusForbidden, "Forbidden")
+		return
+	}
 
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	user, err := h.services.GetUserById(userId)
+	user, err := h.services.GetUserById(getId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -55,6 +94,13 @@ func (h *Handler) getUserById(c *gin.Context) {
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
+	userId, isAdmin, err := getJWT(h, c)
+	getId, err := getUserId(c)
+	if isAdmin == false || userId != getId {
+		c.JSON(http.StatusForbidden, "Forbidden")
+		return
+	}
+
 	var input user.UpdateUserInput
 
 	if err := c.BindJSON(&input); err != nil {
@@ -63,13 +109,12 @@ func (h *Handler) updateUser(c *gin.Context) {
 		return
 	}
 
-	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	err = h.services.UpdateUser(userId, input)
+	err = h.services.UpdateUser(getId, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -79,6 +124,10 @@ func (h *Handler) updateUser(c *gin.Context) {
 }
 
 func (h *Handler) deleteUser(c *gin.Context) {
+	if checkAdmin(h, c) == false {
+		c.JSON(http.StatusForbidden, "Forbidden")
+		return
+	}
 	userId, err := getUserId(c)
 
 	if err != nil {
