@@ -1,4 +1,4 @@
-CREATE TABLE "user" (
+CREATE TABLE users (
     id serial primary key ,
     firstname varchar(50) DEFAULT NULL,
     lastname varchar(50) DEFAULT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE "dialog" (
 
 CREATE TABLE "faculty" (
    id serial primary key,
-   name_program varchar(240) DEFAULT NULL
+   title varchar(240) DEFAULT NULL
 )
 
 CREATE TABLE "post" (
