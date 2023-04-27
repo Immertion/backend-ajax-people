@@ -33,7 +33,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			activation := users.Group("/activation")
 			{
-				activation.POST("/send", h.sendActivationUser)
 				activation.POST("/check", h.checkActivationUser)
 			}
 		}

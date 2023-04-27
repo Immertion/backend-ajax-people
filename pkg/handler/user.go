@@ -95,27 +95,6 @@ func (h *Handler) deleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, "Ok")
 }
 
-func (h *Handler) sendActivationUser(c *gin.Context) {
-	token, err := c.Cookie("jwtToken")
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	userId, err := h.services.ParseToken(token)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	err = h.services.SendCodeActivation(userId)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	}
-
-	c.JSON(http.StatusOK, "send")
-}
-
 type Message struct {
 	Content string `json:"content" binding:"required"`
 }
@@ -127,7 +106,7 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 		return
 	}
 
-	userId, err := h.services.ParseToken(token)
+	userId, _, err := h.services.ParseToken(token)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
