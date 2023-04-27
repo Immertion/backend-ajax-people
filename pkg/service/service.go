@@ -8,7 +8,7 @@ import (
 type Authorization interface {
 	CreateUser(user user.User) (int, error)
 	GenerateToken(username, password string) (string, error)
-	ParseToken(token string) (int, error)
+	ParseToken(token string) (int, bool, error)
 }
 
 type UserAction interface {
@@ -45,6 +45,6 @@ func NewService(repos *repository.Repository) *Service {
 }
 
 // NewSendMessageService Заглушка
-func NewSendMessageService(mail repository.Mail) Mail {
-	return nil
-}
+//func NewSendMessageService(mail repository.Mail) Mail {
+//	return nil
+//}

@@ -33,12 +33,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			activation := users.Group("/activation")
 			{
-				activation.POST("/send", h.sendActivationUser)
 				activation.POST("/check", h.checkActivationUser)
 			}
 		}
 
-		api.POST("/mail", h.sendMessageMail)
+		//api.POST("/mail", h.sendMessageMail)
 
 		faculty := api.Group("/faculty")
 		{

@@ -22,6 +22,11 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
+	err = h.services.SendCodeActivation(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})

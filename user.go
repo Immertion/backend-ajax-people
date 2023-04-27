@@ -15,7 +15,7 @@ type User struct {
 	SchoolId       int    `json:"schoolId"`
 	AdmissionYear  string `json:"admissionYear"`
 	GraduationYear string `json:"graduationYear"`
-	IsAdmin        bool   `json:"isAdmin"`
+	IsAdmin        bool   `json:"isAdmin" db:"is_admin"`
 	IsVerificated  bool   `json:"isVerificated"`
 	IsVisible      bool   `json:"isVisible"`
 	AvatarPath     string `json:"avatarPath"`
