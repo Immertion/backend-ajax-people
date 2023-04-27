@@ -47,6 +47,18 @@ CREATE TABLE "post" (
 )
 
 CREATE TABLE "school" (
-  id serial primary key,
-  school_name varchar(255) DEFAULT NULL
+    id serial primary key,
+    title varchar(255) DEFAULT NULL
 )
+
+CREATE TABLE "interest" (
+   id serial primary key,
+   title varchar(240) DEFAULT NULL
+)
+
+CREATE TABLE users_interests
+(
+    id      serial                                           not null unique,
+    user_id int references users (id) on delete cascade not null,
+    interest_id int references interest (id) on delete cascade not null
+);

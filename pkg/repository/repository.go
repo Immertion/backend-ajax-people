@@ -23,15 +23,17 @@ type Mail interface {
 	CheckCodeActivation(id int, rdmKey string) (bool, error)
 }
 
-type Faculty interface {
-	GetAll() ([]user.Faculty, error)
+type RegisterData interface {
+	GetAllFaculties() ([]user.Faculty, error)
+	GetAllInterests() ([]user.Interest, error)
+	GetAllSchools() ([]user.School, error)
 }
 
 type Repository struct {
 	Authorization
 	UserAction
 	Mail
-	Faculty
+	RegisterData
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -39,6 +41,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Authorization: NewAuthPostgres(db),
 		UserAction:    NewUserActionPostgres(db),
 		Mail:          NewMailPostgres(db),
-		Faculty:       NewFacultyActionPostgres(db),
+		RegisterData:  NewRegisterDataPostgres(db),
 	}
 }

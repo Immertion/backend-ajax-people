@@ -19,8 +19,12 @@ type UserAction interface {
 	GetAllUsers() ([]user.User, error)
 }
 
-type Faculty interface {
-	GetAll() ([]user.Faculty, error)
+type RegisterData interface {
+	GetAllFaculties() ([]user.Faculty, error)
+	GetAllInterests() ([]user.Interest, error)
+	GetAllStatuses() []user.StatusUser
+	GetAllEdLevels() []user.EducationLevel
+	GetAllSchools() ([]user.School, error)
 }
 
 type Mail interface {
@@ -32,7 +36,7 @@ type Service struct {
 	Authorization
 	UserAction
 	Mail
-	Faculty
+	RegisterData
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -40,6 +44,6 @@ func NewService(repos *repository.Repository) *Service {
 		NewAuthService(repos.Authorization),
 		NewUserActionService(repos.UserAction),
 		NewSendMessageService(repos.Mail),
-		NewFacultyActionService(repos.Faculty),
+		NewRegisterDataService(repos.RegisterData),
 	}
 }
