@@ -15,6 +15,38 @@ CREATE TABLE "user" (
     is_verificated bool DEFAULT NULL,
     is_visible bool DEFAULT NULL,
     avatar_path varchar(100) DEFAULT NULL,
-    is_moderated bool DEFAULT NULL
+    is_moderated bool DEFAULT NULL,
+    activation_code varchar(10)
 )
 
+CREATE TABLE "coincidence" (
+   id serial primary key ,
+   user1_id int DEFAULT NULL,
+   user2_id int DEFAULT NULL,
+   coincidence_time timestamp NULL DEFAULT NULL
+)
+
+CREATE TABLE "dialog" (
+  id serial primary key,
+  user1_id int DEFAULT NULL,
+  user2_id int DEFAULT NULL,
+  time_mess timestamp NULL DEFAULT NULL
+)
+
+CREATE TABLE "faculty" (
+   id serial primary key,
+   name_program varchar(240) DEFAULT NULL
+)
+
+CREATE TABLE "post" (
+    id serial primary key,
+    user_id int DEFAULT NULL,
+    text_post text,
+    is_moderated bool DEFAULT NULL,
+    publication_time timestamp NULL DEFAULT NULL
+)
+
+CREATE TABLE "school" (
+  id serial primary key,
+  school_name varchar(255) DEFAULT NULL
+)
