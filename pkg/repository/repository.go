@@ -2,7 +2,6 @@ package repository
 
 import (
 	user "backend_ajax-people"
-	"container/list"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -14,13 +13,14 @@ type Authorization interface {
 type UserAction interface {
 	CreateUser(user user.User) (int, error)
 	GetUser(id int) (user.User, error)
-	GetAllUsers() (*list.List, error)
+	GetAllUsers() ([]user.User, error)
 	DeleteUser(id int) error
-	UpdateUser(id int, user user.User) (int, error)
+	UpdateUser(id int, user user.UpdateUserInput) error
 }
 
 type Mail interface {
-	SendMessage(message string, jwt string) (int, string)
+	SendCodeActivation(id int, rdmKey string) (string, error)
+	CheckCodeActivation(id int, rdmKey string) (bool, error)
 }
 
 type Repository struct {

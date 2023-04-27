@@ -19,6 +19,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.POST("/sign-up", h.signUp)
 	router.POST("/sign-in", h.signIn)
+	router.POST("/test", h.test)
 
 	api := router.Group("/api")
 	{
@@ -29,8 +30,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.GET("/:id", h.getUserById)
 			users.DELETE("/:id", h.deleteUser)
 			users.PUT("/:id", h.updateUser)
+
+			activation := users.Group("/activation")
+			{
+				activation.POST("/send", h.sendActivationUser)
+				activation.POST("/check", h.checkActivationUser)
+			}
 		}
-		api.POST("/mail", h.sendMessageMail)
 	}
 	return router
 }

@@ -3,7 +3,6 @@ package service
 import (
 	user "backend_ajax-people"
 	"backend_ajax-people/pkg/repository"
-	"container/list"
 )
 
 type UserActionService struct {
@@ -27,10 +26,10 @@ func (s *UserActionService) DeleteUser(id int) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *UserActionService) UpdateUser(id int, user user.User) (int, error) {
+func (s *UserActionService) UpdateUser(id int, user user.UpdateUserInput) error {
 	return s.repo.UpdateUser(id, user)
 }
 
-func (s *UserActionService) GetAllUsers() (*list.List, error) {
+func (s *UserActionService) GetAllUsers() ([]user.User, error) {
 	return s.repo.GetAllUsers()
 }

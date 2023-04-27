@@ -2,11 +2,9 @@ package handler
 
 import (
 	user "backend_ajax-people"
-	"container/list"
 	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func (h *Handler) createUser(c *gin.Context) {
@@ -30,9 +28,7 @@ func (h *Handler) createUser(c *gin.Context) {
 }
 
 func (h *Handler) getAllUsers(c *gin.Context) {
-	userList := list.New()
-
-	userList, err := h.services.UserAction.GetAllUsers()
+	userList, err := h.services.GetAllUsers()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -57,7 +53,7 @@ func (h *Handler) getUserById(c *gin.Context) {
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
-	var input user.User
+	var input user.UpdateUserInput
 
 	if err := c.BindJSON(&input); err != nil {
 		fmt.Printf("Failed to update a user: %s\n", err.Error())
@@ -71,13 +67,13 @@ func (h *Handler) updateUser(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.UpdateUser(userId, input)
+	err = h.services.UpdateUser(userId, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, id)
+	c.JSON(http.StatusOK, "Ok")
 }
 
 func (h *Handler) deleteUser(c *gin.Context) {
@@ -94,28 +90,59 @@ func (h *Handler) deleteUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, err)
+	c.JSON(http.StatusOK, "Ok")
+}
+
+func (h *Handler) sendActivationUser(c *gin.Context) {
+	token, err := c.Cookie("jwtToken")
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	userId, err := h.services.ParseToken(token)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.services.SendCodeActivation(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, "send")
 }
 
 type Message struct {
 	Content string `json:"content" binding:"required"`
 }
 
-func (h *Handler) sendMessageMail(c *gin.Context) {
-	var message Message
-
-	if err := c.BindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, "failed to send a message")
+func (h *Handler) checkActivationUser(c *gin.Context) {
+	token, err := c.Cookie("jwtToken")
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	fmt.Println(message.Content)
+	userId, err := h.services.ParseToken(token)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	//_, _, err := h.services.SendMessage(message, "token")
-	//if err != nil {
-	//	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	//	return
-	//}
+	var code Message
 
-	c.JSON(http.StatusOK, message.Content)
+	if err := c.BindJSON(&code); err != nil {
+		c.JSON(http.StatusBadRequest, "Fail")
+		return
+	}
+
+	verified, err := h.services.CheckCodeActivation(userId, code.Content)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, verified)
 }
