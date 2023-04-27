@@ -5,11 +5,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type signInInput struct {
-	Firstname string `json:"firstname" binding:"required"`
-	Password  string `json:"password" binding:"required"`
-}
-
 type errorResponse struct {
 	Message string `json:"message"`
 }

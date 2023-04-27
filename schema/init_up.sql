@@ -11,12 +11,12 @@ CREATE TABLE users (
     school_id int DEFAULT NULL,
     admission_year timestamp DEFAULT NULL,
     graduation_year timestamp DEFAULT NULL,
-    is_admin bool DEFAULT FALSE,
-    is_verificated bool DEFAULT FALSE,
     is_visible bool DEFAULT NULL,
     avatar_path varchar(100) DEFAULT NULL,
     is_moderated bool DEFAULT NULL,
-    activation_code varchar(10)
+    activation_code varchar(10),
+    is_admin bool DEFAULT FALSE,
+    is_verificated bool DEFAULT FALSE
 )
 
 CREATE TABLE "coincidence" (
