@@ -19,16 +19,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.POST("/sign-up", h.signUp)
 	router.POST("/sign-in", h.signIn)
-	//router.POST("/test", h.test)
+	router.POST("/test", h.test)
 
-	api := router.Group("/api")
+	apiPublic := router.Group("/api")
 	{
-		users := api.Group("/users")
+		users := apiPublic.Group("/users")
 		{
-			users.POST("/", h.createUser)
 			users.GET("/", h.getAllUsers)
 			users.GET("/:id", h.getUserById)
-			users.DELETE("/:id", h.deleteUser)
 			users.PUT("/:id", h.updateUser)
 
 			activation := users.Group("/activation")
@@ -37,15 +35,27 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			}
 		}
 
-		//api.POST("/mail", h.sendMessageMail)
-
 		registerData := api.Group("/register-data")
+
+		faculty := apiPublic.Group("/faculty")
 		{
 			registerData.GET("/faculties", h.getAllFaculties)
 			registerData.GET("/interests", h.getAllInterests)
 			registerData.GET("/user-statuses", h.getAllStatuses)
 			registerData.GET("/education-levels", h.getAllEdLevels)
 			registerData.GET("/schools", h.getAllSchools)
+		}
+	}
+
+	apiPrivate := router.Group("/apiP")
+	{
+		users := apiPrivate.Group("/users")
+		{
+			users.POST("/", h.createUser)
+			users.GET("/", h.getAllUsers)
+			users.GET("/:id", h.getUserById)
+			users.DELETE("/:id", h.deleteUser)
+			users.PUT("/:id", h.updateUser)
 		}
 	}
 
