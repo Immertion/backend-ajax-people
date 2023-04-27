@@ -5,10 +5,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const (
-	facultiesTable = "faculty"
-)
-
 type Authorization interface {
 	CreateUser(user user.User) (int, error)
 	GetUser(username, password string) (user.User, error)

@@ -46,11 +46,9 @@ func (r *UserActionPostgres) GetAllUsers() ([]user.User, error) {
 	}
 
 	return userList, nil
-
 }
 
 func (r *UserActionPostgres) DeleteUser(id int) error {
-
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", userTable)
 	_, err := r.db.Exec(query, id)
 	return err

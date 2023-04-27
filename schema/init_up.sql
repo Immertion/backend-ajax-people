@@ -1,10 +1,10 @@
-CREATE TABLE "user" (
+CREATE TABLE users (
     id serial primary key ,
-    first_name varchar(50) DEFAULT NULL,
-    last_name varchar(50) DEFAULT NULL,
+    firstname varchar(50) DEFAULT NULL,
+    lastname varchar(50) DEFAULT NULL,
     password varchar(255) DEFAULT NULL,
     age int DEFAULT NULL,
-    email varchar(50) DEFAULT NULL,
+    mail varchar(50) DEFAULT NULL,
     status_user varchar(50) DEFAULT NULL,
     education_level varchar(50) DEFAULT NULL,
     study_program_id int DEFAULT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE "dialog" (
 
 CREATE TABLE "faculty" (
    id serial primary key,
-   name_program varchar(240) DEFAULT NULL
+   title varchar(240) DEFAULT NULL
 )
 
 CREATE TABLE "post" (
