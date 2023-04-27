@@ -19,6 +19,10 @@ type UserAction interface {
 	GetAllUsers() ([]user.User, error)
 }
 
+type Faculty interface {
+	GetAll() ([]user.Faculty, error)
+}
+
 type Mail interface {
 	SendCodeActivation(id int) error
 	CheckCodeActivation(id int, rdmKey string) (bool, error)
@@ -28,6 +32,7 @@ type Service struct {
 	Authorization
 	UserAction
 	Mail
+	Faculty
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -35,5 +40,11 @@ func NewService(repos *repository.Repository) *Service {
 		NewAuthService(repos.Authorization),
 		NewUserActionService(repos.UserAction),
 		NewSendMessageService(repos.Mail),
+		NewFacultyActionService(repos.Faculty),
 	}
+}
+
+// NewSendMessageService Заглушка
+func NewSendMessageService(mail repository.Mail) Mail {
+	return nil
 }

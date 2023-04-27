@@ -37,6 +37,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				activation.POST("/check", h.checkActivationUser)
 			}
 		}
+
+		api.POST("/mail", h.sendMessageMail)
+
+		faculty := api.Group("/faculty")
+		{
+			faculty.GET("/", h.getAllFaculties)
+		}
+
 	}
+
 	return router
 }

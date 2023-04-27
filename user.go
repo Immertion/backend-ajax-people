@@ -44,3 +44,8 @@ func (i UpdateUserInput) Validate() error {
 
 	return nil
 }
+
+type Faculty struct {
+	Id    int    `json:"-" db:"id"`
+	Title string `json:"title" binding:"required"`
+}

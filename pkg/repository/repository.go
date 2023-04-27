@@ -5,6 +5,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const (
+	facultiesTable = "faculty"
+)
+
 type Authorization interface {
 	CreateUser(user user.User) (int, error)
 	GetUser(username, password string) (user.User, error)
@@ -23,10 +27,15 @@ type Mail interface {
 	CheckCodeActivation(id int, rdmKey string) (bool, error)
 }
 
+type Faculty interface {
+	GetAll() ([]user.Faculty, error)
+}
+
 type Repository struct {
 	Authorization
 	UserAction
 	Mail
+	Faculty
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -34,5 +43,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Authorization: NewAuthPostgres(db),
 		UserAction:    NewUserActionPostgres(db),
 		Mail:          NewMailPostgres(db),
+		Faculty:       NewFacultyActionPostgres(db),
 	}
 }

@@ -39,10 +39,12 @@ func (h *Handler) getAllUsers(c *gin.Context) {
 
 func (h *Handler) getUserById(c *gin.Context) {
 	userId, err := getUserId(c)
+
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	user, err := h.services.GetUserById(userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
