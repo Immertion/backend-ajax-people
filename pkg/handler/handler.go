@@ -35,9 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			}
 		}
 
-		registerData := api.Group("/register-data")
-
-		faculty := apiPublic.Group("/faculty")
+		registerData := apiPublic.Group("/register-data")
 		{
 			registerData.GET("/faculties", h.getAllFaculties)
 			registerData.GET("/interests", h.getAllInterests)
@@ -47,7 +45,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 	}
 
-	apiPrivate := router.Group("/apiP")
+	apiPrivate := router.Group("/api-private")
 	{
 		users := apiPrivate.Group("/users")
 		{
