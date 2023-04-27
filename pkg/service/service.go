@@ -43,8 +43,3 @@ func NewService(repos *repository.Repository) *Service {
 		NewFacultyActionService(repos.Faculty),
 	}
 }
-
-// NewSendMessageService Заглушка
-//func NewSendMessageService(mail repository.Mail) Mail {
-//	return nil
-//}

@@ -7,6 +7,7 @@ import (
 	"backend_ajax-people/pkg/service"
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -44,11 +45,12 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(user.Server)
-	if err := srv.Run((viper.GetString("port")), handlers.InitRoutes()); err != nil {
+	gin.SetMode(gin.ReleaseMode)
+	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		log.Fatalf("error occured while ruunning http server: %s", err.Error())
 	}
 
-	logrus.Print("WebSite Started")
+	logrus.Println("WebSite Started")
 
 	if err := srv.Shutdown(context.Background()); err != nil {
 		logrus.Errorf("error occured on server shutting down: %s", err.Error())

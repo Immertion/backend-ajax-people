@@ -5,10 +5,10 @@ import "errors"
 type User struct {
 	Id             int    `json:"-" db:"id"`
 	FirstName      string `json:"firstName" binding:"required"`
-	LastName       string `json:"lastName" binding:"required"`
+	Mail           string `json:"mail" binding:"required"`
 	Password       string `json:"password" binding:"required"`
+	LastName       string `json:"lastName"`
 	Age            int    `json:"age"`
-	Mail           string `json:"mail"`
 	StatusUser     string `json:"statusUser"`
 	EducationLevel string `json:"educationLevel"`
 	StudyProgramId int    `json:"studyProgramId"`
@@ -43,9 +43,4 @@ func (i UpdateUserInput) Validate() error {
 	}
 
 	return nil
-}
-
-type Faculty struct {
-	Id    int    `json:"-" db:"id"`
-	Title string `json:"title" binding:"required"`
 }

@@ -19,7 +19,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.POST("/sign-up", h.signUp)
 	router.POST("/sign-in", h.signIn)
-	router.POST("/test", h.test)
+	//router.POST("/test", h.test)
 
 	api := router.Group("/api")
 	{
@@ -43,7 +43,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			faculty.GET("/", h.getAllFaculties)
 		}
-
 	}
 
 	return router
