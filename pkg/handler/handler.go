@@ -31,6 +31,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.PUT("/:id", h.updateUser)
 		}
 		api.POST("/mail", h.sendMessageMail)
+
+		faculty := api.Group("/faculty")
+		{
+			faculty.GET("/", h.getAllFaculties)
+		}
 	}
+
 	return router
 }

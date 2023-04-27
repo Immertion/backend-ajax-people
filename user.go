@@ -19,3 +19,8 @@ type User struct {
 	AvatarPath     string `json:"avatar_path"`
 	IsModerated    bool   `json:"is_moderated"`
 }
+
+type Faculty struct {
+	Id    int    `json:"-" db:"id"`
+	Title string `json:"title" binding:"required"`
+}
