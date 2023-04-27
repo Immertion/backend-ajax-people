@@ -3,7 +3,6 @@ package service
 import (
 	user "backend_ajax-people"
 	"backend_ajax-people/pkg/repository"
-	"container/list"
 )
 
 type Authorization interface {
@@ -16,8 +15,8 @@ type UserAction interface {
 	CreateUser(user user.User) (int, error)
 	GetUserById(id int) (user.User, error)
 	DeleteUser(id int) error
-	UpdateUser(id int, user user.User) (int, error)
-	GetAllUsers() (*list.List, error)
+	UpdateUser(id int, user user.UpdateUserInput) error
+	GetAllUsers() ([]user.User, error)
 }
 
 type Faculty interface {
@@ -25,7 +24,8 @@ type Faculty interface {
 }
 
 type Mail interface {
-	SendMessage(message string, jwt string) (int, string, error)
+	SendCodeActivation(id int) error
+	CheckCodeActivation(id int, rdmKey string) (bool, error)
 }
 
 type Service struct {
