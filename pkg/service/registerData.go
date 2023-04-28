@@ -3,6 +3,7 @@ package service
 import (
 	user "backend_ajax-people"
 	"backend_ajax-people/pkg/repository"
+	"github.com/spf13/viper"
 )
 
 type RegisterDataService struct {
@@ -18,7 +19,16 @@ func (s *RegisterDataService) GetAllFaculties() ([]user.Faculty, error) {
 }
 
 func (s *RegisterDataService) GetAllInterests() ([]user.Interest, error) {
-	return s.repo.GetAllInterests()
+	interests, err := s.repo.GetAllInterests()
+	if err != nil {
+		return interests, err
+	}
+
+	for index, _ := range interests {
+		interests[index].Color = viper.GetString("colors." + interests[index].Color)
+	}
+
+	return interests, nil
 }
 
 var statusesSlice = []user.StatusUser{
