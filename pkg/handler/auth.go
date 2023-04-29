@@ -33,8 +33,8 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 type signInInput struct {
-	Firstname string `json:"firstName" binding:"required"`
-	Password  string `json:"password" binding:"required"`
+	Email    string `json:"mail" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func (h *Handler) signIn(c *gin.Context) {
@@ -45,7 +45,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.services.Authorization.GenerateToken(input.Firstname, input.Password)
+	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -63,4 +63,10 @@ func (h *Handler) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
 	})
+}
+
+func (h *Handler) signOut(c *gin.Context) {
+	c.SetCookie("jwtToken", "", -1, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, "ok")
 }

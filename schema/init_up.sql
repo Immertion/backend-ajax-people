@@ -81,3 +81,15 @@ CREATE TABLE users_interests
     user_id int references users (id) on delete cascade not null,
     interest_id int references interest (id) on delete cascade not null
 );
+
+alter table post rename column text_post to text;
+
+alter table post alter column text set not null;
+
+alter table post alter column is_moderated set default false;
+
+alter table post alter column publication_time set not null;
+
+alter table post
+add constraint post_users_id_fk
+    foreign key (user_id) references users;

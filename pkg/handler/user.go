@@ -74,7 +74,7 @@ func (h *Handler) getAllUsers(c *gin.Context) {
 func (h *Handler) getUserById(c *gin.Context) {
 	userId, isAdmin, err := getJWT(h, c)
 	getId, err := getUserId(c)
-	if isAdmin == false || userId != getId {
+	if isAdmin == false && userId != getId {
 		c.JSON(http.StatusForbidden, "Forbidden")
 		return
 	}
@@ -96,7 +96,7 @@ func (h *Handler) getUserById(c *gin.Context) {
 func (h *Handler) updateUser(c *gin.Context) {
 	userId, isAdmin, err := getJWT(h, c)
 	getId, err := getUserId(c)
-	if isAdmin == false || userId != getId {
+	if isAdmin == false && userId != getId {
 		c.JSON(http.StatusForbidden, "Forbidden")
 		return
 	}

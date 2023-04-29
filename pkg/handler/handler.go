@@ -19,6 +19,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.POST("/sign-up", h.signUp)
 	router.POST("/sign-in", h.signIn)
+	router.POST("/sign-out", h.signOut)
 	router.POST("/test", h.test)
 
 	apiPublic := router.Group("/api")
