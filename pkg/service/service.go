@@ -32,11 +32,20 @@ type Mail interface {
 	CheckCodeActivation(id int, rdmKey string) (bool, error)
 }
 
+type Post interface {
+	CreatePost(text string, userId int) (int, error)
+	GetPostById(id int) (user.Post, error)
+	GetAllPosts() ([]user.Post, error)
+	UpdatePost(id int, isModerated bool) error
+	DeletePost(id int) error
+}
+
 type Service struct {
 	Authorization
 	UserAction
 	Mail
 	RegisterData
+	Post
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -45,5 +54,6 @@ func NewService(repos *repository.Repository) *Service {
 		NewUserActionService(repos.UserAction),
 		NewSendMessageService(repos.Mail),
 		NewRegisterDataService(repos.RegisterData),
+		NewPostService(repos.Post),
 	}
 }

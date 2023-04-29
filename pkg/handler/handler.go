@@ -43,6 +43,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			registerData.GET("/education-levels", h.getAllEdLevels)
 			registerData.GET("/schools", h.getAllSchools)
 		}
+
+		posts := apiPublic.Group("/posts")
+		{
+			posts.GET("/:id", h.getPostById)
+			posts.GET("/", h.getAllPosts)
+			posts.POST("/", h.createPost)
+			posts.PUT("/:id", h.updatePost)
+			posts.DELETE("/:id", h.deletePost)
+		}
 	}
 
 	apiPrivate := router.Group("/api-private")
