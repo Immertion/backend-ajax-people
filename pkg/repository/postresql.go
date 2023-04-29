@@ -20,6 +20,7 @@ const (
 	interestsTable = "interest"
 	schoolsTable   = "school"
 	postsTable     = "post"
+	tagsTable      = "tag"
 )
 
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {

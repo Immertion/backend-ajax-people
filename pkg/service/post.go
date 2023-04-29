@@ -40,3 +40,20 @@ func (s *PostService) UpdatePost(id int, isModerated bool) error {
 func (s *PostService) DeletePost(id int) error {
 	return s.repo.DeletePost(id)
 }
+
+func (s *PostService) CreateTag(title string) (int, error) {
+	newTag := user.Tag{Title: title}
+	return s.repo.CreateTag(newTag)
+}
+
+func (s *PostService) GetTagById(id int) (user.Tag, error) {
+	return s.repo.GetTagById(id)
+}
+
+func (s *PostService) GetAllTags() ([]user.Tag, error) {
+	return s.repo.GetAllTags()
+}
+
+func (s *PostService) DeleteTag(id int) error {
+	return s.repo.DeleteTag(id)
+}

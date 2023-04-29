@@ -52,6 +52,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			posts.PUT("/:id", h.updatePost)
 			posts.DELETE("/:id", h.deletePost)
 		}
+
+		tags := apiPublic.Group("/tags")
+		{
+			tags.GET("/:id", h.getTagById)
+			tags.GET("/", h.getAllTags)
+			tags.POST("/", h.createTag)
+			tags.DELETE("/:id", h.deleteTag)
+		}
 	}
 
 	apiPrivate := router.Group("/api-private")

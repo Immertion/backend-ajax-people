@@ -38,6 +38,10 @@ type Post interface {
 	GetAllPosts() ([]user.Post, error)
 	UpdatePost(id int, isModerated bool) error
 	DeletePost(id int) error
+	CreateTag(title string) (int, error)
+	GetTagById(id int) (user.Tag, error)
+	GetAllTags() ([]user.Tag, error)
+	DeleteTag(id int) error
 }
 
 type Service struct {

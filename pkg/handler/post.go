@@ -6,6 +6,9 @@ import (
 	"strconv"
 )
 
+// Посты
+
+// Получить пост по id
 func (h *Handler) getPostById(c *gin.Context) {
 	var postId int
 
@@ -24,6 +27,7 @@ func (h *Handler) getPostById(c *gin.Context) {
 	c.JSON(http.StatusOK, post)
 }
 
+// Получить все посты
 func (h *Handler) getAllPosts(c *gin.Context) {
 	postsList, err := h.services.GetAllPosts()
 	if err != nil {
@@ -38,6 +42,7 @@ type PostInput struct {
 	Text string `json:"text" binding:"required"`
 }
 
+// Создать новый пост
 func (h *Handler) createPost(c *gin.Context) {
 	var input PostInput
 
@@ -66,6 +71,7 @@ type postUpdateInput struct {
 	IsModerated bool `json:"isModerated" binding:"required"`
 }
 
+// Обновить пост (модерировать)
 func (h *Handler) updatePost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -87,6 +93,7 @@ func (h *Handler) updatePost(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
+// Удалить пост
 func (h *Handler) deletePost(c *gin.Context) {
 	postId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -95,6 +102,79 @@ func (h *Handler) deletePost(c *gin.Context) {
 	}
 
 	err = h.services.DeletePost(postId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}
+
+// Тэги
+
+// Получить тэг по id
+func (h *Handler) getTagById(c *gin.Context) {
+	var tagId int
+
+	tagId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	tag, err := h.services.GetTagById(tagId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, tag)
+}
+
+// Получить все тэги
+func (h *Handler) getAllTags(c *gin.Context) {
+	tagsList, err := h.services.GetAllTags()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, tagsList)
+}
+
+type TagInput struct {
+	Title string `json:"title" binding:"required"`
+}
+
+// Создать новый  тэг
+func (h *Handler) createTag(c *gin.Context) {
+	var input TagInput
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "Failed to create a tag")
+		return
+	}
+
+	id, err := h.services.CreateTag(input.Title)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
+}
+
+// Удалить тэг
+func (h *Handler) deleteTag(c *gin.Context) {
+	tagId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = h.services.DeleteTag(tagId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

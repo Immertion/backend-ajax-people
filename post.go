@@ -7,3 +7,8 @@ type Post struct {
 	IsModerated     bool   `json:"isModerated" db:"is_moderated" binding:"required"`
 	PublicationTime string `json:"publicationTime" db:"publication_time"`
 }
+
+type Tag struct {
+	Id    int    `json:"id" db:"id"`
+	Title string `json:"title" db:"title" binding:"required"`
+}
