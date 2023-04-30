@@ -128,3 +128,92 @@ func (r *UserActionPostgres) UpdateUser(id int, user user.UpdateUserInput) error
 
 	return err
 }
+
+func (r *UserActionPostgres) SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error) {
+	var userList []user.User
+
+	setDataBaseValues := make([]string, 0)
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+	setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("firstname"))
+	setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("lastname"))
+
+	if userSelect.FirstName != nil {
+		setValues = append(setValues, fmt.Sprintf("firstname=$%d", argId))
+		args = append(args, *userSelect.FirstName)
+		argId++
+	}
+
+	if userSelect.LastName != nil {
+		setValues = append(setValues, fmt.Sprintf("lastname=$%d", argId))
+		args = append(args, *userSelect.LastName)
+		argId++
+	}
+
+	if userSelect.StatusUser != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("status_user"))
+		setValues = append(setValues, fmt.Sprintf("status_user=$%d", argId))
+		args = append(args, *userSelect.StatusUser)
+		argId++
+	}
+
+	if userSelect.AdmissionYear != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("admission_year"))
+		setValues = append(setValues, fmt.Sprintf("admission_year=$%d", argId))
+		args = append(args, *userSelect.AdmissionYear)
+		argId++
+	}
+
+	if userSelect.Age != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("age"))
+		setValues = append(setValues, fmt.Sprintf("age=$%d", argId))
+		args = append(args, *userSelect.Age)
+		argId++
+	}
+
+	if userSelect.EducationLevel != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("education_level"))
+		setValues = append(setValues, fmt.Sprintf("education_level=$%d", argId))
+		args = append(args, *userSelect.EducationLevel)
+		argId++
+	}
+
+	if userSelect.GraduationYear != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("graduation_year"))
+		setValues = append(setValues, fmt.Sprintf("graduation_year=$%d", argId))
+		args = append(args, *userSelect.GraduationYear)
+		argId++
+	}
+
+	if userSelect.StudyProgramId != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("study_program_id"))
+		setValues = append(setValues, fmt.Sprintf("study_program_id=$%d", argId))
+		args = append(args, *userSelect.StudyProgramId)
+		argId++
+	}
+
+	if userSelect.SchoolId != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("school_id"))
+		setValues = append(setValues, fmt.Sprintf("school_id=$%d", argId))
+		args = append(args, *userSelect.SchoolId)
+		argId++
+	}
+
+	if userSelect.AvatarPath != nil {
+		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("avatar_path"))
+		setValues = append(setValues, fmt.Sprintf("avatar_path=$%d", argId))
+		args = append(args, *userSelect.AvatarPath)
+		argId++
+	}
+
+	setDataBaseQuery := strings.Join(setDataBaseValues, ", ")
+	setQuery := strings.Join(setValues, " AND ")
+
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", setDataBaseQuery, userTable, setQuery)
+
+	if err := r.db.Select(&userList, query, args...); err != nil {
+		return nil, err
+	}
+	return userList, nil
+}

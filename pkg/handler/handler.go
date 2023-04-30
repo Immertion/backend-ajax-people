@@ -22,7 +22,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.POST("/sign-out", h.signOut)
 	router.POST("/test", h.test)
 
-	apiPublic := router.Group("/api")
+	apiPublic := router.Group("/api", h.userIdentify)
 	{
 		users := apiPublic.Group("/users")
 		{
@@ -34,6 +34,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				activation.POST("/check", h.checkActivationUser)
 			}
+			users.POST("/select", h.selectUsers)
 		}
 
 		registerData := apiPublic.Group("/register-data")
@@ -46,7 +47,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 	}
 
-	apiPrivate := router.Group("/api-private")
+	apiPrivate := router.Group("/api-private", h.userIdentifyAdmin)
 	{
 		users := apiPrivate.Group("/users")
 		{

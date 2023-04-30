@@ -17,6 +17,7 @@ type UserAction interface {
 	DeleteUser(id int) error
 	UpdateUser(id int, user user.UpdateUserInput) error
 	GetAllUsers() ([]user.User, error)
+	SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error)
 }
 
 type RegisterData interface {

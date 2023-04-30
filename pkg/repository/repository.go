@@ -16,6 +16,7 @@ type UserAction interface {
 	GetAllUsers() ([]user.User, error)
 	DeleteUser(id int) error
 	UpdateUser(id int, user user.UpdateUserInput) error
+	SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error)
 }
 
 type Mail interface {

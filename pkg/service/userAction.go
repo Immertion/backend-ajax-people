@@ -33,3 +33,7 @@ func (s *UserActionService) UpdateUser(id int, user user.UpdateUserInput) error 
 func (s *UserActionService) GetAllUsers() ([]user.User, error) {
 	return s.repo.GetAllUsers()
 }
+
+func (s *UserActionService) SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error) {
+	return s.repo.SelectedDataUser(userSelect)
+}

@@ -7,41 +7,7 @@ import (
 	"net/http"
 )
 
-func checkAdmin(h *Handler, c *gin.Context) bool {
-	token, err := c.Cookie("jwtToken")
-	if err != nil {
-		return false
-	}
-
-	_, isAdmin, err := h.services.ParseToken(token)
-	if err != nil {
-		return false
-	}
-
-	return isAdmin
-}
-
-func getJWT(h *Handler, c *gin.Context) (int, bool, error) {
-	token, err := c.Cookie("jwtToken")
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return 0, false, err
-	}
-
-	userId, isAdmin, err := h.services.ParseToken(token)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return 0, false, err
-	}
-
-	return userId, isAdmin, nil
-}
-
 func (h *Handler) createUser(c *gin.Context) {
-	if checkAdmin(h, c) == false {
-		c.JSON(http.StatusForbidden, "Forbidden")
-		return
-	}
 	var input user.User
 
 	if err := c.BindJSON(&input); err != nil {
@@ -72,12 +38,7 @@ func (h *Handler) getAllUsers(c *gin.Context) {
 }
 
 func (h *Handler) getUserById(c *gin.Context) {
-	userId, isAdmin, err := getJWT(h, c)
 	getId, err := getUserId(c)
-	if isAdmin == false && userId != getId {
-		c.JSON(http.StatusForbidden, "Forbidden")
-		return
-	}
 
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -94,13 +55,7 @@ func (h *Handler) getUserById(c *gin.Context) {
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
-	userId, isAdmin, err := getJWT(h, c)
 	getId, err := getUserId(c)
-	if isAdmin == false && userId != getId {
-		c.JSON(http.StatusForbidden, "Forbidden")
-		return
-	}
-
 	var input user.UpdateUserInput
 
 	if err := c.BindJSON(&input); err != nil {
@@ -124,10 +79,6 @@ func (h *Handler) updateUser(c *gin.Context) {
 }
 
 func (h *Handler) deleteUser(c *gin.Context) {
-	if checkAdmin(h, c) == false {
-		c.JSON(http.StatusForbidden, "Forbidden")
-		return
-	}
 	userId, err := getUserId(c)
 
 	if err != nil {
@@ -175,4 +126,23 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, verified)
+}
+
+func (h *Handler) selectUsers(c *gin.Context) {
+	var input user.UpdateUserInput
+	var userList []user.User
+
+	if err := c.BindJSON(&input); err != nil {
+		fmt.Printf("Failed to selected a user: %s\n", err.Error())
+		c.JSON(http.StatusBadRequest, "Failed to selected users")
+		return
+	}
+
+	userList, err := h.services.SelectedDataUser(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, userList)
 }
