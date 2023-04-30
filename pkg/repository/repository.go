@@ -30,11 +30,24 @@ type RegisterData interface {
 	GetAllSchools() ([]user.School, error)
 }
 
+type Post interface {
+	CreatePost(post user.Post) (int, error)
+	GetPostById(id int) (user.Post, error)
+	GetAllPosts() ([]user.Post, error)
+	UpdatePost(id int, isModerated bool) error
+	DeletePost(id int) error
+	CreateTag(tag user.Tag) (int, error)
+	GetTagById(id int) (user.Tag, error)
+	GetAllTags() ([]user.Tag, error)
+	DeleteTag(id int) error
+}
+
 type Repository struct {
 	Authorization
 	UserAction
 	Mail
 	RegisterData
+	Post
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -43,5 +56,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		UserAction:    NewUserActionPostgres(db),
 		Mail:          NewMailPostgres(db),
 		RegisterData:  NewRegisterDataPostgres(db),
+		Post:          NewPostPostgres(db),
 	}
 }
