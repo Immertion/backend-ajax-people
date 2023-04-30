@@ -29,8 +29,8 @@ func (s *PostService) GetPostById(id int) (user.Post, error) {
 	return s.repo.GetPostById(id)
 }
 
-func (s *PostService) GetAllPosts() ([]user.Post, error) {
-	return s.repo.GetAllPosts()
+func (s *PostService) GetAllPosts(filter user.PostFilter) ([]user.Post, error) {
+	return s.repo.GetAllPosts(filter)
 }
 
 func (s *PostService) UpdatePost(id int, isModerated bool) error {

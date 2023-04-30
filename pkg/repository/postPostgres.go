@@ -4,6 +4,7 @@ import (
 	user "backend_ajax-people"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"strings"
 )
 
 type PostPostgres struct {
@@ -29,17 +30,42 @@ func (r *PostPostgres) CreatePost(post user.Post) (int, error) {
 
 func (r *PostPostgres) GetPostById(id int) (user.Post, error) {
 	var post user.Post
+	postQuery := fmt.Sprintf("SELECT user_id, text, is_moderated, publication_time FROM %s WHERE id=$1", postsTable)
+	err := r.db.Get(&post, postQuery, id)
+	if err != nil {
+		return post, err
+	}
 
-	query := fmt.Sprintf("SELECT user_id, text, is_moderated, publication_time FROM %s WHERE id=$1", postsTable)
-	err := r.db.Get(&post, query, id)
+	var tagsList []user.Tag
+	tagsQuery := fmt.Sprintf(
+		"SELECT id, title FROM %s WHERE id IN (SELECT tag_id FROM %s pst JOIN %s pt ON pst.id = pt.post_id WHERE pst.id = $1)",
+		tagsTable, postsTable, postsTagsTable)
+	err = r.db.Select(&tagsList, tagsQuery, id)
+
+	post.Tags = tagsList
 
 	return post, err
 }
 
-func (r *PostPostgres) GetAllPosts() ([]user.Post, error) {
-	var postsList []user.Post
+var orderTypesSql = []string{"DESC", "ASC"}
 
-	query := fmt.Sprintf("SELECT id, user_id, text, is_moderated, publication_time FROM %s", postsTable)
+func (r *PostPostgres) GetAllPosts(filter user.PostFilter) ([]user.Post, error) {
+	orderType := orderTypesSql[filter.OrderBy]
+	addQuery := ""
+
+	if len(filter.TagsList) > 0 {
+		tagsList := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(filter.TagsList)), ","), "[]")
+		addQuery = fmt.Sprintf("AND pt.tag_id IN (%s)", tagsList)
+	}
+
+	query := fmt.Sprintf(
+		`SELECT DISTINCT po.id, po.user_id, po.text, po.is_moderated, po.publication_time FROM %s po
+    					JOIN %s pt ON po.id = pt.post_id %s ORDER BY publication_time %s;`,
+		postsTable, postsTagsTable, addQuery, orderType)
+
+	fmt.Println(query)
+
+	var postsList []user.Post
 	if err := r.db.Select(&postsList, query); err != nil {
 		return nil, err
 	}

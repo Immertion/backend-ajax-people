@@ -6,6 +6,19 @@ type Post struct {
 	Text            string `json:"text" db:"text" binding:"required"`
 	IsModerated     bool   `json:"isModerated" db:"is_moderated" binding:"required"`
 	PublicationTime string `json:"publicationTime" db:"publication_time"`
+	Tags            []Tag  `json:"tags"`
+}
+
+type OrderType int8
+
+const (
+	Ascending OrderType = iota
+	Descending
+)
+
+type PostFilter struct {
+	TagsList []int     `json:"tagsList"`
+	OrderBy  OrderType `json:"orderBy"`
 }
 
 type Tag struct {
