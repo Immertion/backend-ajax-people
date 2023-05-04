@@ -19,11 +19,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.POST("/sign-up", h.signUp)
 	router.POST("/sign-in", h.signIn)
+	router.POST("/sign-out", h.signOut)
 	router.POST("/test", h.test)
 
 	apiPublic := router.Group("/api")
 	{
-		users := apiPublic.Group("/users")
+		users := apiPublic.Group("/users", h.userIdentify)
 		{
 			users.GET("/", h.getAllUsers)
 			users.GET("/:id", h.getUserById)
@@ -33,6 +34,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				activation.POST("/check", h.checkActivationUser)
 			}
+
+			users.POST("/select", h.selectUsers)
+		}
+
+		coincidence := apiPublic.Group("/coincidence")
+		{
+			coincidence.POST("/", h.coincidenceSend)
+			coincidence.PUT("/:id", h.coincidenceAccept)
 		}
 
 		registerData := apiPublic.Group("/register-data")
@@ -62,7 +71,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 	}
 
-	apiPrivate := router.Group("/api-private")
+	apiPrivate := router.Group("/api-private", h.userIdentifyAdmin)
 	{
 		users := apiPrivate.Group("/users")
 		{

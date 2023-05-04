@@ -3,6 +3,8 @@ package service
 import (
 	user "backend_ajax-people"
 	"backend_ajax-people/pkg/repository"
+	"fmt"
+	"time"
 )
 
 type UserActionService struct {
@@ -32,4 +34,17 @@ func (s *UserActionService) UpdateUser(id int, user user.UpdateUserInput) error 
 
 func (s *UserActionService) GetAllUsers() ([]user.User, error) {
 	return s.repo.GetAllUsers()
+}
+
+func (s *UserActionService) SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error) {
+	return s.repo.SelectedDataUser(userSelect)
+}
+
+func (s *UserActionService) RequestСorrespondence(idSender int, emailRecipient string) (int, error) {
+	coincidenceTime := fmt.Sprintln(time.Now().Format(timeFormat))
+	return s.repo.RequestСorrespondence(idSender, emailRecipient, coincidenceTime)
+}
+
+func (s *UserActionService) AcceptMessageRequest(idRequest int) error {
+	return s.repo.AcceptMessageRequest(idRequest)
 }

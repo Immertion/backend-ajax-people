@@ -22,6 +22,8 @@ const (
 	postsTable     = "post"
 	tagsTable      = "tag"
 	postsTagsTable = "posts_tags"
+  coincidenceTable = "coincidence"
+	usersInterests   = "users_interests"
 )
 
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {

@@ -17,6 +17,9 @@ type UserAction interface {
 	DeleteUser(id int) error
 	UpdateUser(id int, user user.UpdateUserInput) error
 	GetAllUsers() ([]user.User, error)
+	SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error)
+	RequestСorrespondence(idSender int, emailRecipient string) (int, error)
+	AcceptMessageRequest(idRequest int) error
 }
 
 type RegisterData interface {
