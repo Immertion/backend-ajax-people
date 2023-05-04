@@ -1,6 +1,7 @@
 package handler
 
 import (
+	user "backend_ajax-people"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -29,7 +30,13 @@ func (h *Handler) getPostById(c *gin.Context) {
 
 // Получить все посты
 func (h *Handler) getAllPosts(c *gin.Context) {
-	postsList, err := h.services.GetAllPosts()
+	var filter user.PostFilter
+	if err := c.BindJSON(&filter); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	postsList, err := h.services.GetAllPosts(filter)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

@@ -15,13 +15,14 @@ type Config struct {
 }
 
 const (
-	userTable        = "users"
-	facultiesTable   = "faculty"
-	interestsTable   = "interest"
-	schoolsTable     = "school"
-	postsTable       = "post"
-	tagsTable        = "tag"
-	coincidenceTable = "coincidence"
+	userTable      = "users"
+	facultiesTable = "faculty"
+	interestsTable = "interest"
+	schoolsTable   = "school"
+	postsTable     = "post"
+	tagsTable      = "tag"
+	postsTagsTable = "posts_tags"
+  coincidenceTable = "coincidence"
 	usersInterests   = "users_interests"
 )
 
