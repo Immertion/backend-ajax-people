@@ -77,9 +77,9 @@ VALUES (DEFAULT, 'Бас-гитара', 'orange');
 
 CREATE TABLE users_interests
 (
-    id      serial                                           not null unique,
-    user_id int references users (id) on delete cascade not null,
-    interest_id int references interest (id) on delete cascade not null
+    id serial primary key ,
+    user_id int not null,
+    interest_id int not null
 );
 
 alter table post rename column text_post to text;
@@ -93,3 +93,8 @@ alter table post alter column publication_time set not null;
 alter table post
 add constraint post_users_id_fk
     foreign key (user_id) references users;
+
+ALTER TABLE "coincidence" ADD COLUMN request_accepted BOOL DEFAULT FALSE;
+
+ALTER TABLE coincidence RENAME COLUMN user1_id TO sendler_id;
+ALTER TABLE coincidence RENAME COLUMN user2_id TO recipient_id;

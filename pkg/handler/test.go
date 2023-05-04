@@ -7,9 +7,13 @@ import (
 	"net/http"
 )
 
+type Json struct {
+	Interests []string `json:"interests"`
+}
+
 func (h *Handler) test(c *gin.Context) {
-	var input user.UpdateUserInput
-	var userList []user.User
+	//idUser, _, err := getJWT(h, c)
+	var input user.User
 
 	if err := c.BindJSON(&input); err != nil {
 		fmt.Printf("Failed to selected a user: %s\n", err.Error())
@@ -17,11 +21,10 @@ func (h *Handler) test(c *gin.Context) {
 		return
 	}
 
-	userList, err := h.services.SelectedDataUser(input)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
+	//err = h.services.AddInterests(input.Interests, idUser)
+	//if err != nil {
+	//	newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	//}
 
-	c.JSON(http.StatusOK, userList)
+	c.JSON(http.StatusOK, input)
 }

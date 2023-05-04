@@ -4,6 +4,7 @@ import (
 	user "backend_ajax-people"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"strconv"
 	"strings"
 )
 
@@ -119,19 +120,43 @@ func (r *UserActionPostgres) UpdateUser(id int, user user.UpdateUserInput) error
 		argId++
 	}
 
+	// добавление интересов
+	var plug int
+
+	for i := 0; i < len(user.IdsInterests); i++ {
+
+		var interestExists bool
+		query := fmt.Sprintf("SELECT EXISTS(SELECT id FROM %s WHERE user_id=$1 AND interest_id=$2)", usersInterests)
+		_ = r.db.Get(&interestExists, query, id, user.IdsInterests[i])
+		if interestExists {
+			continue
+		}
+
+		query = fmt.Sprintf("INSERT INTO %s (user_id, interest_id) values ($1, $2) RETURNING id", usersInterests)
+
+		row := r.db.QueryRow(query, id, user.IdsInterests[i])
+		if err := row.Scan(&plug); err != nil {
+			return err
+		}
+	}
+
 	setQuery := strings.Join(setValues, ", ")
 
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d;", userTable, setQuery, argId)
+	if setQuery != "" {
+		query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d;", userTable, setQuery, argId)
 
-	args = append(args, id)
-	_, err := r.db.Exec(query, args...)
+		args = append(args, id)
+		_, err := r.db.Exec(query, args...)
+		return err
 
-	return err
+	}
+	return nil
 }
 
 func (r *UserActionPostgres) SelectedDataUser(userSelect user.UpdateUserInput) ([]user.User, error) {
 	var userList []user.User
 
+	setInterests := make([]string, 0)
 	setDataBaseValues := make([]string, 0)
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -210,10 +235,63 @@ func (r *UserActionPostgres) SelectedDataUser(userSelect user.UpdateUserInput) (
 	setDataBaseQuery := strings.Join(setDataBaseValues, ", ")
 	setQuery := strings.Join(setValues, " AND ")
 
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", setDataBaseQuery, userTable, setQuery)
+	flag := false
+	for i := 0; i < len(userSelect.IdsInterests); i++ {
+		setInterests = append(setInterests, "users_interests.interest_id="+strconv.Itoa(userSelect.IdsInterests[i]))
+		flag = true
+	}
+
+	if flag {
+		setInterestsQuery := " AND ("
+		setInterestsQuery += strings.Join(setInterests, " OR ")
+		setInterestsQuery += ")"
+		setQuery += setInterestsQuery
+
+	}
+
+	query := fmt.Sprintf(`SELECT DISTINCT %s FROM %s JOIN %s ON users.id = users_interests.user_id
+    							JOIN %s ON users_interests.interest_id = interest.id 
+                                WHERE %s`, setDataBaseQuery, userTable, usersInterests, interestsTable, setQuery)
 
 	if err := r.db.Select(&userList, query, args...); err != nil {
 		return nil, err
 	}
 	return userList, nil
+}
+
+func (r *UserActionPostgres) RequestСorrespondence(idSender int, emailRecipient, coincidenceTime string) (int, error) {
+	var idRecipient int
+	var idCoincidence int
+	var requestExists bool
+
+	query := fmt.Sprintf("SELECT id FROM %s WHERE mail=$1", userTable)
+	err := r.db.Get(&idRecipient, query, emailRecipient)
+	if err != nil {
+		return 0, err
+	}
+
+	query = fmt.Sprintf("SELECT EXISTS(SELECT * FROM %s WHERE sendler_id=$1 AND recipient_id=$2)", coincidenceTable)
+	err = r.db.Get(&requestExists, query, idSender, idRecipient)
+	if err != nil || requestExists {
+		return -1, err
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (sendler_id, recipient_id, coincidence_time) values ($1, $2, $3) RETURNING id", coincidenceTable)
+	row := r.db.QueryRow(query, idSender, idRecipient, coincidenceTime)
+	if err = row.Scan(&idCoincidence); err != nil {
+		return 0, err
+	}
+
+	return idCoincidence, nil
+}
+
+func (r *UserActionPostgres) AcceptMessageRequest(idRequest int) error {
+
+	query := fmt.Sprintf("UPDATE %s SET request_accepted=true WHERE id=$1;", coincidenceTable)
+	_, err := r.db.Exec(query, idRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

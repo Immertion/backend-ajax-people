@@ -3,26 +3,28 @@ package user
 import "errors"
 
 type User struct {
-	Id             int    `json:"-" db:"id"`
-	FirstName      string `json:"firstName" binding:"required"`
-	Mail           string `json:"mail" binding:"required"`
-	Password       string `json:"password" binding:"required"`
-	LastName       string `json:"lastName"`
-	Age            int    `json:"age"`
-	StatusUser     string `json:"statusUser"`
-	EducationLevel string `json:"educationLevel"`
-	StudyProgramId int    `json:"studyProgramId"`
-	SchoolId       int    `json:"schoolId"`
-	AdmissionYear  string `json:"admissionYear"`
-	GraduationYear string `json:"graduationYear"`
-	IsAdmin        bool   `json:"isAdmin" db:"is_admin"`
-	IsVerificated  bool   `json:"isVerificated"`
-	IsVisible      bool   `json:"isVisible"`
-	AvatarPath     string `json:"avatarPath"`
-	IsModerated    bool   `json:"isModerated"`
+	Id             int      `json:"-" db:"id"`
+	FirstName      string   `json:"firstName" binding:"required"`
+	Mail           string   `json:"mail" binding:"required"`
+	Password       string   `json:"password" binding:"required"`
+	Interests      []string `json:"interests"`
+	LastName       string   `json:"lastName"`
+	Age            int      `json:"age"`
+	StatusUser     string   `json:"statusUser"`
+	EducationLevel string   `json:"educationLevel"`
+	StudyProgramId int      `json:"studyProgramId"`
+	SchoolId       int      `json:"schoolId"`
+	AdmissionYear  string   `json:"admissionYear"`
+	GraduationYear string   `json:"graduationYear"`
+	IsAdmin        bool     `json:"isAdmin" db:"is_admin"`
+	IsVerificated  bool     `json:"isVerificated"`
+	IsVisible      bool     `json:"isVisible"`
+	AvatarPath     string   `json:"avatarPath"`
+	IsModerated    bool     `json:"isModerated"`
 }
 
 type UpdateUserInput struct {
+	IdsInterests   []int   `json:"idInterests"`
 	FirstName      *string `json:"firstName"`
 	LastName       *string `json:"lastName"`
 	Age            *int    `json:"age"`
