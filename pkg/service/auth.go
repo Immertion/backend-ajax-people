@@ -18,8 +18,9 @@ const (
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId  int  `json:"user_id"`
-	IsAdmin bool `json:"is_admin"`
+	UserId        int  `json:"user_id"`
+	IsAdmin       bool `json:"is_admin"`
+	IsVerificated bool `json:"is_verificated"`
 }
 
 func generatePasswordHash(password string) string {
@@ -55,12 +56,13 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 		},
 		user.Id,
 		user.IsAdmin,
+		user.IsVerificated,
 	})
 
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *AuthService) ParseToken(accessToken string) (int, bool, error) {
+func (s *AuthService) ParseToken(accessToken string) (int, bool, bool, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -69,13 +71,13 @@ func (s *AuthService) ParseToken(accessToken string) (int, bool, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, false, err
+		return 0, false, false, err
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, false, errors.New("token claims are not of type *tokenClaims")
+		return 0, false, false, errors.New("token claims are not of type *tokenClaims")
 	}
-	fmt.Println(claims.IsAdmin)
-	return claims.UserId, claims.IsAdmin, nil
+
+	return claims.UserId, claims.IsAdmin, claims.IsVerificated, nil
 }

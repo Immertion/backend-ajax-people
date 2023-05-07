@@ -19,12 +19,14 @@ func (h *Handler) signUp(c *gin.Context) {
 	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil {
 		fmt.Printf("Failed data: %s\n", err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = h.services.SendCodeActivation(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{

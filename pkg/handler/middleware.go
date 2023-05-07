@@ -18,7 +18,7 @@ func checkAdmin(h *Handler, c *gin.Context) bool {
 		return false
 	}
 
-	_, isAdmin, err := h.services.ParseToken(token)
+	_, isAdmin, _, err := h.services.ParseToken(token)
 	if err != nil {
 		return false
 	}
@@ -26,35 +26,42 @@ func checkAdmin(h *Handler, c *gin.Context) bool {
 	return isAdmin
 }
 
-func getJWT(h *Handler, c *gin.Context) (int, bool, error) {
+func getJWT(h *Handler, c *gin.Context) (int, bool, bool, error) {
 	token, err := c.Cookie("jwtToken")
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return 0, false, err
+		return 0, false, false, err
 	}
 
-	userId, isAdmin, err := h.services.ParseToken(token)
+	userId, isAdmin, isVerificated, err := h.services.ParseToken(token)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return 0, false, err
+		return 0, false, false, err
 	}
 
-	return userId, isAdmin, nil
+	return userId, isAdmin, isVerificated, nil
 }
 
 func (h *Handler) userIdentify(c *gin.Context) {
-	userId, isAdmin, err := getJWT(h, c)
+	_, _, isVerificated, err := getJWT(h, c)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
+	if !isVerificated {
+		newErrorResponse(c, http.StatusUnauthorized, "Your account is not verified")
+	}
+}
 
+func (h *Handler) userIdentifyById(c *gin.Context) {
+	userId, _, _, _ := getJWT(h, c)
 	getId, err := getUserId(c)
-	if isAdmin == false && userId != getId {
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	if userId != getId {
 		if getId == 0 {
 			return
 		}
-		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized")
+		newErrorResponse(c, http.StatusForbidden, "Forbidden")
 		return
 	}
 
@@ -64,6 +71,23 @@ func (h *Handler) userIdentifyAdmin(c *gin.Context) {
 	if checkAdmin(h, c) == false {
 		newErrorResponse(c, http.StatusForbidden, "Forbidden")
 		return
+	}
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
 	}
 }
 

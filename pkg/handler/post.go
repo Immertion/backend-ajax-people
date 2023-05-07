@@ -36,7 +36,9 @@ func (h *Handler) getAllPosts(c *gin.Context) {
 		return
 	}
 
-	postsList, err := h.services.GetAllPosts(filter)
+	idUser, isAdmin, _, _ := getJWT(h, c)
+
+	postsList, err := h.services.GetAllPosts(filter, isAdmin, idUser)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -47,6 +49,7 @@ func (h *Handler) getAllPosts(c *gin.Context) {
 
 type PostInput struct {
 	Text string `json:"text" binding:"required"`
+	Tags []int  `json:"tags" binding:"required"`
 }
 
 // Создать новый пост
@@ -58,12 +61,12 @@ func (h *Handler) createPost(c *gin.Context) {
 		return
 	}
 
-	userId, _, err := getJWT(h, c)
+	userId, _, _, err := getJWT(h, c)
 	if err != nil {
 		return
 	}
 
-	id, err := h.services.CreatePost(input.Text, userId)
+	id, err := h.services.CreatePost(input.Text, input.Tags, userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "Failed data: "+err.Error())
 		return

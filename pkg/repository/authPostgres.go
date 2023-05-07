@@ -2,6 +2,7 @@ package repository
 
 import (
 	user "backend_ajax-people"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
@@ -21,7 +22,8 @@ func (r *AuthPostgres) CreateUser(user user.User) (int, error) {
 	query := fmt.Sprintf("SELECT EXISTS(SELECT * FROM %s WHERE mail=$1)", userTable)
 	err := r.db.Get(&userExists, query, user.Mail)
 	if err != nil || userExists {
-		return -1, err
+		err = errors.New("this email already exists")
+		return 0, err
 	}
 
 	query = fmt.Sprintf("INSERT INTO %s (firstname, lastname, password, mail) values ($1, $2, $3, $4) RETURNING id", userTable)
@@ -38,7 +40,7 @@ func (r *AuthPostgres) CreateUser(user user.User) (int, error) {
 func (r *AuthPostgres) GetUser(email, password string) (user.User, error) {
 	var user user.User
 
-	query := fmt.Sprintf("SELECT id, is_admin FROM %s WHERE mail=$1 AND password=$2", userTable)
+	query := fmt.Sprintf("SELECT id, is_admin, is_verificated FROM %s WHERE mail=$1 AND password=$2", userTable)
 	err := r.db.Get(&user, query, email, password)
 
 	return user, err

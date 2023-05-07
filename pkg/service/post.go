@@ -16,21 +16,21 @@ func NewPostService(repo repository.Post) *PostService {
 }
 
 const (
-	timeFormat = "2006-01-02T15:04:05"
+	timeFormat = "2006-01-02T15:04:05Z"
 )
 
-func (s *PostService) CreatePost(text string, userId int) (int, error) {
+func (s *PostService) CreatePost(text string, tags []int, userId int) (int, error) {
 	pblTime := fmt.Sprintln(time.Now().Format(timeFormat))
 	newPost := user.Post{UserId: userId, Text: text, PublicationTime: pblTime}
-	return s.repo.CreatePost(newPost)
+	return s.repo.CreatePost(newPost, tags)
 }
 
 func (s *PostService) GetPostById(id int) (user.Post, error) {
 	return s.repo.GetPostById(id)
 }
 
-func (s *PostService) GetAllPosts(filter user.PostFilter) ([]user.Post, error) {
-	return s.repo.GetAllPosts(filter)
+func (s *PostService) GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error) {
+	return s.repo.GetAllPosts(filter, isAdmin, idUser)
 }
 
 func (s *PostService) UpdatePost(id int, isModerated bool) error {

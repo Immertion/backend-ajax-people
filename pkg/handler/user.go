@@ -101,12 +101,12 @@ type Message struct {
 }
 
 func (h *Handler) checkActivationUser(c *gin.Context) {
-	userId, _, err := getJWT(h, c)
+	userId, _, _, err := getJWT(h, c)
 
 	var code Message
 
 	if err := c.BindJSON(&code); err != nil {
-		c.JSON(http.StatusBadRequest, "Fail")
+		c.JSON(http.StatusBadRequest, "Wrong content")
 		return
 	}
 
@@ -115,8 +115,12 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	if !verified {
+		c.JSON(http.StatusOK, "Code is not correct")
+		return
+	}
 
-	c.JSON(http.StatusOK, verified)
+	c.JSON(http.StatusOK, "Successfully")
 }
 
 func (h *Handler) selectUsers(c *gin.Context) {
@@ -138,7 +142,7 @@ func (h *Handler) selectUsers(c *gin.Context) {
 }
 
 func (h *Handler) coincidenceSend(c *gin.Context) {
-	idSender, _, err := getJWT(h, c)
+	idSender, _, _, err := getJWT(h, c)
 	var input Message
 
 	if err := c.BindJSON(&input); err != nil {

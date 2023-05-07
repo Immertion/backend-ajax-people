@@ -8,7 +8,7 @@ import (
 type Authorization interface {
 	CreateUser(user user.User) (int, error)
 	GenerateToken(username, password string) (string, error)
-	ParseToken(token string) (int, bool, error)
+	ParseToken(token string) (int, bool, bool, error)
 }
 
 type UserAction interface {
@@ -36,9 +36,9 @@ type Mail interface {
 }
 
 type Post interface {
-	CreatePost(text string, userId int) (int, error)
+	CreatePost(text string, tags []int, userId int) (int, error)
 	GetPostById(id int) (user.Post, error)
-	GetAllPosts(filter user.PostFilter) ([]user.Post, error)
+	GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error)
 	UpdatePost(id int, isModerated bool) error
 	DeletePost(id int) error
 	CreateTag(title string) (int, error)

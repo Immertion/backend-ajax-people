@@ -33,9 +33,9 @@ type RegisterData interface {
 }
 
 type Post interface {
-	CreatePost(post user.Post) (int, error)
+	CreatePost(post user.Post, tags []int) (int, error)
 	GetPostById(id int) (user.Post, error)
-	GetAllPosts(filter user.PostFilter) ([]user.Post, error)
+	GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error)
 	UpdatePost(id int, isModerated bool) error
 	DeletePost(id int) error
 	CreateTag(tag user.Tag) (int, error)

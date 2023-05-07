@@ -6,7 +6,7 @@ type Post struct {
 	Text            string `json:"text" db:"text" binding:"required"`
 	IsModerated     bool   `json:"isModerated" db:"is_moderated" binding:"required"`
 	PublicationTime string `json:"publicationTime" db:"publication_time"`
-	Tags            []Tag  `json:"tags"`
+	Tags            []Tag  `json:"tags" db:"tags_id"`
 }
 
 type OrderType int8

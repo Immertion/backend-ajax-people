@@ -2,7 +2,6 @@ package handler
 
 import (
 	"backend_ajax-people/pkg/service"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,23 +16,25 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	router.Use(CORSMiddleware())
+
 	router.POST("/sign-up", h.signUp)
 	router.POST("/sign-in", h.signIn)
 	router.POST("/sign-out", h.signOut)
 	router.POST("/test", h.test)
 
-	apiPublic := router.Group("/api")
+	activation := router.Group("/activation")
 	{
-		users := apiPublic.Group("/users", h.userIdentify)
+		activation.POST("/check", h.checkActivationUser)
+	}
+
+	apiPublic := router.Group("/api", h.userIdentify)
+	{
+		users := apiPublic.Group("/users", h.userIdentifyById)
 		{
 			users.GET("/", h.getAllUsers)
 			users.GET("/:id", h.getUserById)
 			users.PUT("/:id", h.updateUser)
-
-			activation := users.Group("/activation")
-			{
-				activation.POST("/check", h.checkActivationUser)
-			}
 
 			users.POST("/select", h.selectUsers)
 		}

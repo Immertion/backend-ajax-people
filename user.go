@@ -4,7 +4,7 @@ import "errors"
 
 type User struct {
 	Id             int      `json:"-" db:"id"`
-	FirstName      string   `json:"firstName" binding:"required"`
+	FirstName      string   `json:"firstName"`
 	Mail           string   `json:"mail" binding:"required"`
 	Password       string   `json:"password" binding:"required"`
 	Interests      []string `json:"interests"`
@@ -17,7 +17,7 @@ type User struct {
 	AdmissionYear  string   `json:"admissionYear"`
 	GraduationYear string   `json:"graduationYear"`
 	IsAdmin        bool     `json:"isAdmin" db:"is_admin"`
-	IsVerificated  bool     `json:"isVerificated"`
+	IsVerificated  bool     `json:"isVerificated" db:"is_verificated"`
 	IsVisible      bool     `json:"isVisible"`
 	AvatarPath     string   `json:"avatarPath"`
 	IsModerated    bool     `json:"isModerated"`

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	_ "github.com/rs/cors"
 	"net/http"
 	"time"
 )
