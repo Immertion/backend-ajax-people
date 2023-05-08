@@ -101,7 +101,7 @@ type Message struct {
 }
 
 func (h *Handler) checkActivationUser(c *gin.Context) {
-	userId, _, _, err := getJWT(h, c)
+	userId, _ := getUserId(c)
 
 	var code Message
 
