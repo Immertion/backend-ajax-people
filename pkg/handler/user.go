@@ -116,7 +116,7 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 		return
 	}
 	if !verified {
-		c.JSON(http.StatusOK, "Code is not correct")
+		c.JSON(http.StatusBadRequest, "Code is not correct")
 		return
 	}
 
