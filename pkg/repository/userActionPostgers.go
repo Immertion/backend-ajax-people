@@ -41,9 +41,18 @@ func (r *UserActionPostgres) GetUser(id int) (user.User, error) {
 func (r *UserActionPostgres) GetAllUsers() ([]user.User, error) {
 	var userList []user.User
 
-	query := fmt.Sprintf("SELECT firstname, lastname FROM %s", userTable)
+	query := fmt.Sprintf("SELECT id,firstname, lastname,mail,age,status_user, education_level,study_program_id,school_id,avatar_path FROM %s", userTable)
 	if err := r.db.Select(&userList, query); err != nil {
 		return nil, err
+	}
+
+	for i := 0; i < len(userList); i++ {
+		query = fmt.Sprintf(`SELECT DISTINCT interest_id FROM %s
+    								JOIN %s ON users.id = users_interests.user_id WHERE user_id = $1;`,
+			userTable, usersInterests)
+		if err := r.db.Select(&userList[i].Interests, query, userList[i].Id); err != nil {
+			return nil, err
+		}
 	}
 
 	return userList, nil
@@ -157,12 +166,9 @@ func (r *UserActionPostgres) SelectedDataUser(userSelect user.UpdateUserInput) (
 	var userList []user.User
 
 	setInterests := make([]string, 0)
-	setDataBaseValues := make([]string, 0)
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
-	setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("firstname"))
-	setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("lastname"))
 
 	if userSelect.FirstName != nil {
 		setValues = append(setValues, fmt.Sprintf("firstname=$%d", argId))
@@ -177,62 +183,53 @@ func (r *UserActionPostgres) SelectedDataUser(userSelect user.UpdateUserInput) (
 	}
 
 	if userSelect.StatusUser != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("status_user"))
 		setValues = append(setValues, fmt.Sprintf("status_user=$%d", argId))
 		args = append(args, *userSelect.StatusUser)
 		argId++
 	}
 
 	if userSelect.AdmissionYear != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("admission_year"))
 		setValues = append(setValues, fmt.Sprintf("admission_year=$%d", argId))
 		args = append(args, *userSelect.AdmissionYear)
 		argId++
 	}
 
 	if userSelect.Age != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("age"))
 		setValues = append(setValues, fmt.Sprintf("age=$%d", argId))
 		args = append(args, *userSelect.Age)
 		argId++
 	}
 
 	if userSelect.EducationLevel != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("education_level"))
 		setValues = append(setValues, fmt.Sprintf("education_level=$%d", argId))
 		args = append(args, *userSelect.EducationLevel)
 		argId++
 	}
 
 	if userSelect.GraduationYear != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("graduation_year"))
 		setValues = append(setValues, fmt.Sprintf("graduation_year=$%d", argId))
 		args = append(args, *userSelect.GraduationYear)
 		argId++
 	}
 
 	if userSelect.StudyProgramId != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("study_program_id"))
 		setValues = append(setValues, fmt.Sprintf("study_program_id=$%d", argId))
 		args = append(args, *userSelect.StudyProgramId)
 		argId++
 	}
 
 	if userSelect.SchoolId != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("school_id"))
 		setValues = append(setValues, fmt.Sprintf("school_id=$%d", argId))
 		args = append(args, *userSelect.SchoolId)
 		argId++
 	}
 
 	if userSelect.AvatarPath != nil {
-		setDataBaseValues = append(setDataBaseValues, fmt.Sprintf("avatar_path"))
 		setValues = append(setValues, fmt.Sprintf("avatar_path=$%d", argId))
 		args = append(args, *userSelect.AvatarPath)
 		argId++
 	}
 
-	setDataBaseQuery := strings.Join(setDataBaseValues, ", ")
 	setQuery := strings.Join(setValues, " AND ")
 
 	flag := false
@@ -249,13 +246,25 @@ func (r *UserActionPostgres) SelectedDataUser(userSelect user.UpdateUserInput) (
 
 	}
 
-	query := fmt.Sprintf(`SELECT DISTINCT %s FROM %s JOIN %s ON users.id = users_interests.user_id
+	query := fmt.Sprintf(`SELECT DISTINCT users.id, firstname, lastname,mail,age,status_user, 
+                				education_level,study_program_id,school_id,avatar_path 
+								FROM %s JOIN %s ON users.id = users_interests.user_id
     							JOIN %s ON users_interests.interest_id = interest.id 
-                                WHERE %s`, setDataBaseQuery, userTable, usersInterests, interestsTable, setQuery)
+                                WHERE %s`, userTable, usersInterests, interestsTable, setQuery)
 
 	if err := r.db.Select(&userList, query, args...); err != nil {
 		return nil, err
 	}
+
+	for i := 0; i < len(userList); i++ {
+		query = fmt.Sprintf(`SELECT DISTINCT interest_id FROM %s
+    								JOIN %s ON users.id = users_interests.user_id WHERE user_id = $1;`,
+			userTable, usersInterests)
+		if err := r.db.Select(&userList[i].Interests, query, userList[i].Id); err != nil {
+			return nil, err
+		}
+	}
+
 	return userList, nil
 }
 

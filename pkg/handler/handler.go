@@ -40,6 +40,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.POST("/select", h.selectUsers)
 		}
 
+		apiPublic.POST("/upload", h.Upload)
+
 		coincidence := apiPublic.Group("/coincidence")
 		{
 			coincidence.POST("/", h.coincidenceSend)

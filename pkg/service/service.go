@@ -47,12 +47,18 @@ type Post interface {
 	DeleteTag(id int) error
 }
 
+type Uploader interface {
+	Upload(id int, file []byte, size int64, contextType string) (string, error)
+	generateFileName() string
+}
+
 type Service struct {
 	Authorization
 	UserAction
 	Mail
 	RegisterData
 	Post
+	Uploader
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -62,5 +68,6 @@ func NewService(repos *repository.Repository) *Service {
 		NewSendMessageService(repos.Mail),
 		NewRegisterDataService(repos.RegisterData),
 		NewPostService(repos.Post),
+		NewUploaderService(repos.FileStorageImage),
 	}
 }

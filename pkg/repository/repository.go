@@ -44,20 +44,26 @@ type Post interface {
 	DeleteTag(id int) error
 }
 
+type FileStorageImage interface {
+	Upload(id int, input UploadInput) (string, error)
+}
+
 type Repository struct {
 	Authorization
 	UserAction
 	Mail
 	RegisterData
 	Post
+	FileStorageImage
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Authorization: NewAuthPostgres(db),
-		UserAction:    NewUserActionPostgres(db),
-		Mail:          NewMailPostgres(db),
-		RegisterData:  NewRegisterDataPostgres(db),
-		Post:          NewPostPostgres(db),
+		Authorization:    NewAuthPostgres(db),
+		UserAction:       NewUserActionPostgres(db),
+		Mail:             NewMailPostgres(db),
+		RegisterData:     NewRegisterDataPostgres(db),
+		Post:             NewPostPostgres(db),
+		FileStorageImage: NewFileStorage(db),
 	}
 }

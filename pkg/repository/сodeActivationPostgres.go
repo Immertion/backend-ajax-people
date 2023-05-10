@@ -40,19 +40,10 @@ func (r *MailPostgres) CheckCodeActivation(id int, rdmKey string) (bool, error) 
 		return false, err
 	}
 
-	if codeActivation == rdmKey {
-		verified = true
-	} else {
-		verified = false
-	}
+	verified = codeActivation == rdmKey
 
-	if verified == true {
-		query2 := fmt.Sprintf("UPDATE %s SET is_verificated=true WHERE id=$1", userTable)
-		r.db.Get(&codeActivation, query2, id)
-	} else {
-		query2 := fmt.Sprintf("UPDATE %s SET is_verificated=false WHERE id=$1", userTable)
-		r.db.Get(&codeActivation, query2, id)
-	}
+	query2 := fmt.Sprintf("UPDATE %s SET is_verificated=$1 WHERE id=$2", userTable)
+	r.db.Get(&codeActivation, query2, verified, id)
 
 	return verified, err
 }
