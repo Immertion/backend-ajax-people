@@ -38,7 +38,7 @@ func (h *Handler) Upload(c *gin.Context) {
 
 	path, err := h.services.Upload(userId, fileBytes, fileHeader.Size, fileType)
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
 	c.JSON(http.StatusOK, path)

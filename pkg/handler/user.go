@@ -65,11 +65,6 @@ func (h *Handler) updateUser(c *gin.Context) {
 		return
 	}
 
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
 	err = h.services.UpdateUser(getId, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -169,7 +164,7 @@ func (h *Handler) coincidenceAccept(c *gin.Context) {
 
 	reqId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	err = h.services.AcceptMessageRequest(reqId)
