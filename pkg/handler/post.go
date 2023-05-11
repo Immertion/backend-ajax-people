@@ -47,6 +47,34 @@ func (h *Handler) getAllPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, postsList)
 }
 
+func (h *Handler) getPostsByPage(c *gin.Context) {
+	var postPage int
+	var postQuantity int
+
+	idUser, isAdmin, _, _ := getJWT(h, c)
+
+	postPage, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	postQuantity, err = strconv.Atoi(c.Query("items"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	postsList, err := h.services.GetPostByPage(postPage-1, postQuantity, isAdmin, idUser)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, postsList)
+
+}
+
 type PostInput struct {
 	Text string `json:"text" binding:"required"`
 	Tags []int  `json:"tags" binding:"required"`

@@ -79,6 +79,63 @@ func (r *PostPostgres) GetPostById(id int) (user.Post, error) {
 	return post, err
 }
 
+func (r *PostPostgres) GetPostByPage(page int, items int, isAdmin bool, idUser int) ([]user.Post, error) {
+	var postListPage []user.Post
+
+	addQuery := ""
+	isModer := ""
+
+	if !isAdmin {
+		isModer += "WHERE po.is_moderated=true"
+	}
+
+	query := fmt.Sprintf(
+		`SELECT DISTINCT po.id, po.user_id, po.text, po.is_moderated, po.publication_time FROM %s po
+    					JOIN %s pt ON po.id = pt.post_id %s %s ;`,
+		postsTable, postsTagsTable, addQuery, isModer)
+
+	var postsList []user.Post
+	if err := r.db.Select(&postsList, query); err != nil {
+		return nil, err
+	}
+	query = fmt.Sprintf(
+		`SELECT DISTINCT po.id, po.user_id, po.text, po.is_moderated, po.publication_time FROM %s po
+    					JOIN %s pt ON po.id = pt.post_id %s WHERE po.user_id = $1 AND po.is_moderated=false;`,
+		postsTable, postsTagsTable, addQuery)
+
+	var postsList1 []user.Post
+	if err := r.db.Select(&postsList1, query, idUser); err != nil {
+		return nil, err
+	}
+	postsList = append(postsList, postsList1...)
+
+	for i := 0; i < len(postsList); i++ {
+		var tagsList []user.Tag
+		tagsQuery := fmt.Sprintf(
+			"SELECT id, title FROM %s WHERE id IN (SELECT tag_id FROM %s pst JOIN %s pt ON pst.id = pt.post_id WHERE pst.id = $1)",
+			tagsTable, postsTable, postsTagsTable)
+		err := r.db.Select(&tagsList, tagsQuery, postsList[i].Id)
+		if err != nil {
+			return postsList, err
+		}
+
+		postsList[i].Tags = tagsList
+	}
+
+	var lastItems int
+	if page*items+items > len(postsList) {
+		lastItems = (page * items) + items - len(postsList)
+	} else {
+		lastItems = items
+	}
+
+	for i := page * items; i < page*items+lastItems; i++ {
+		postListPage = append(postListPage, postsList[i])
+	}
+
+	return postListPage, nil
+}
+
 var orderTypesSql = []string{"DESC", "ASC"}
 
 func (r *PostPostgres) GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error) {

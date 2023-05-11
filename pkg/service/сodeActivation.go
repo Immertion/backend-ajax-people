@@ -64,7 +64,11 @@ func randInt(min int, max int) int {
 func randomString(l int) string {
 	bytes := make([]byte, l)
 	for i := 0; i < l; i++ {
-		bytes[i] = byte(randInt(65, 90))
+		if randInt(1, 3) == 1 {
+			bytes[i] = byte(randInt(65, 90))
+		} else {
+			bytes[i] = byte(randInt(48, 57))
+		}
 	}
 	return string(bytes)
 }

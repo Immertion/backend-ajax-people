@@ -182,6 +182,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			posts.GET("/", h.getAllPosts)
 
 			/*
+				get - /:name&items - Получение постов где page это страница а items колво постов на странице
+				выход: Список постов
+				Ошибки: 400 - Неверный параметр
+						500 - Нет доступа к серверу
+			*/
+			posts.GET("/pagination", h.getPostsByPage)
+
+			/*
 				post - / - Создание поста
 				вход: text(string), tags([]int)
 				выход: id поста
