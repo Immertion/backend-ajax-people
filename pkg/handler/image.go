@@ -14,7 +14,7 @@ var IMAGE_TYPES = map[string]interface{}{
 	"image/png":  nil,
 }
 
-func (h *Handler) Upload(c *gin.Context) {
+func (h *Handler) uploadAvatar(c *gin.Context) {
 	userId, _, _, _ := getJWT(h, c)
 
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, MAX_UPLOAD_SIZE)
@@ -43,4 +43,15 @@ func (h *Handler) Upload(c *gin.Context) {
 
 	c.JSON(http.StatusOK, path)
 
+}
+
+func (h *Handler) getAvatar(c *gin.Context) {
+	userId, _ := getUserId(c)
+
+	fileBase64, err := h.services.GetAvatar(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, fileBase64)
 }

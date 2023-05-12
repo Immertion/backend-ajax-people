@@ -29,8 +29,8 @@ func (s *PostService) GetPostById(id int) (user.Post, error) {
 	return s.repo.GetPostById(id)
 }
 
-func (s *PostService) GetPostByPage(page int, items int, isAdmin bool, idUser int) ([]user.Post, error) {
-	return s.repo.GetPostByPage(page, items, isAdmin, idUser)
+func (s *PostService) GetPostByPage(filter user.PostFilter, page int, items int, isAdmin bool, idUser int) ([]user.Post, error) {
+	return s.repo.GetPostByPage(filter, page, items, isAdmin, idUser)
 }
 
 func (s *PostService) GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error) {

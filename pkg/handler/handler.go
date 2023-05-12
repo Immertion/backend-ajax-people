@@ -105,8 +105,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			Ошибки: 400 - Неверный формат данных
 					500 - Нет доступа к серверу
 		*/
-		apiPublic.POST("/upload", h.Upload)
-
+		avatars := apiPublic.Group("/avatar")
+		{
+			avatars.POST("/upload", h.uploadAvatar)
+			avatars.GET("/:id", h.getAvatar)
+		}
 		coincidence := apiPublic.Group("/coincidence")
 		{
 			/*
@@ -179,15 +182,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				выход: Список постов
 				Ошибки: 500 - Нет доступа к серверу
 			*/
-			posts.GET("/", h.getAllPosts)
-
-			/*
-				get - /:name&items - Получение постов где page это страница а items колво постов на странице
-				выход: Список постов
-				Ошибки: 400 - Неверный параметр
-						500 - Нет доступа к серверу
-			*/
-			posts.GET("/pagination", h.getPostsByPage)
+			posts.GET("/", h.getPostsByPage)
 
 			/*
 				post - / - Создание поста

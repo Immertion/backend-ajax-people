@@ -79,9 +79,12 @@ func (r *PostPostgres) GetPostById(id int) (user.Post, error) {
 	return post, err
 }
 
-func (r *PostPostgres) GetPostByPage(page int, items int, isAdmin bool, idUser int) ([]user.Post, error) {
+var orderTypesSql = []string{"DESC", "ASC"}
+
+func (r *PostPostgres) GetPostByPage(filter user.PostFilter, page int, items int, isAdmin bool, idUser int) ([]user.Post, error) {
 	var postListPage []user.Post
 
+	orderType := orderTypesSql[filter.OrderBy]
 	addQuery := ""
 	isModer := ""
 
@@ -89,10 +92,16 @@ func (r *PostPostgres) GetPostByPage(page int, items int, isAdmin bool, idUser i
 		isModer += "WHERE po.is_moderated=true"
 	}
 
+	if len(filter.TagsList) > 0 {
+		tagsList := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(filter.TagsList)), ","), "[]")
+		addQuery = fmt.Sprintf("AND pt.tag_id IN (%s)", tagsList)
+	}
+
 	query := fmt.Sprintf(
 		`SELECT DISTINCT po.id, po.user_id, po.text, po.is_moderated, po.publication_time FROM %s po
-    					JOIN %s pt ON po.id = pt.post_id %s %s ;`,
-		postsTable, postsTagsTable, addQuery, isModer)
+    					JOIN %s pt ON po.id = pt.post_id %s %s ORDER BY publication_time %s ;`,
+		postsTable, postsTagsTable, addQuery, isModer, orderType)
+	fmt.Println(query)
 
 	var postsList []user.Post
 	if err := r.db.Select(&postsList, query); err != nil {
@@ -102,6 +111,7 @@ func (r *PostPostgres) GetPostByPage(page int, items int, isAdmin bool, idUser i
 		`SELECT DISTINCT po.id, po.user_id, po.text, po.is_moderated, po.publication_time FROM %s po
     					JOIN %s pt ON po.id = pt.post_id %s WHERE po.user_id = $1 AND po.is_moderated=false;`,
 		postsTable, postsTagsTable, addQuery)
+	fmt.Println(query)
 
 	var postsList1 []user.Post
 	if err := r.db.Select(&postsList1, query, idUser); err != nil {
@@ -122,9 +132,16 @@ func (r *PostPostgres) GetPostByPage(page int, items int, isAdmin bool, idUser i
 		postsList[i].Tags = tagsList
 	}
 
+	if page == -1 || items == 0 {
+		return postsList, nil
+	}
+
 	var lastItems int
-	if page*items+items > len(postsList) {
-		lastItems = (page * items) + items - len(postsList)
+	if page*items+items-len(postsList) > 0 && items-((page*items)+items-len(postsList)) <= 0 {
+		err := errors.New("There are no posts on this page")
+		return postsList, err
+	} else if page*items+items > len(postsList) {
+		lastItems = items - ((page * items) + items - len(postsList))
 	} else {
 		lastItems = items
 	}
@@ -135,8 +152,6 @@ func (r *PostPostgres) GetPostByPage(page int, items int, isAdmin bool, idUser i
 
 	return postListPage, nil
 }
-
-var orderTypesSql = []string{"DESC", "ASC"}
 
 func (r *PostPostgres) GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error) {
 	orderType := orderTypesSql[filter.OrderBy]
@@ -157,7 +172,6 @@ func (r *PostPostgres) GetAllPosts(filter user.PostFilter, isAdmin bool, idUser 
     					JOIN %s pt ON po.id = pt.post_id %s %s ORDER BY publication_time %s;`,
 		postsTable, postsTagsTable, addQuery, isModer, orderType)
 
-	fmt.Println(query)
 	var postsList []user.Post
 	if err := r.db.Select(&postsList, query); err != nil {
 		return nil, err

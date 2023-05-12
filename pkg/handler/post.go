@@ -2,9 +2,11 @@ package handler
 
 import (
 	user "backend_ajax-people"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Посты
@@ -29,47 +31,53 @@ func (h *Handler) getPostById(c *gin.Context) {
 }
 
 // Получить все посты
-func (h *Handler) getAllPosts(c *gin.Context) {
-	var filter user.PostFilter
-	if err := c.BindJSON(&filter); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	idUser, isAdmin, _, _ := getJWT(h, c)
-
-	postsList, err := h.services.GetAllPosts(filter, isAdmin, idUser)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, postsList)
-}
+//func (h *Handler) getAllPosts(c *gin.Context) {
+//	var filter user.PostFilter
+//	if err := c.BindJSON(&filter); err != nil {
+//		newErrorResponse(c, http.StatusBadRequest, err.Error())
+//		return
+//	}
+//
+//	idUser, isAdmin, _, _ := getJWT(h, c)
+//
+//	postsList, err := h.services.GetAllPosts(filter, isAdmin, idUser)
+//	if err != nil {
+//		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+//		return
+//	}
+//
+//	c.JSON(http.StatusOK, postsList)
+//}
 
 func (h *Handler) getPostsByPage(c *gin.Context) {
 	var postPage int
 	var postQuantity int
 
+	//var filter user.PostFilter
+
 	idUser, isAdmin, _, _ := getJWT(h, c)
 
-	postPage, err := strconv.Atoi(c.Query("page"))
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
+	var filter user.PostFilter
+	postPage, _ = strconv.Atoi(c.Query("page"))
+	postQuantity, _ = strconv.Atoi(c.Query("items"))
+	orderBy, _ := strconv.Atoi(c.Query("orderBy"))
+	filter.OrderBy = user.OrderType(orderBy)
+	tags := strings.Split(c.Query("tags"), `,`)
+	for _, s := range tags {
+		num, err := strconv.Atoi(s)
+		if err == nil {
+			filter.TagsList = append(filter.TagsList, num)
+		}
 	}
 
-	postQuantity, err = strconv.Atoi(c.Query("items"))
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
+	//fmt.Println(postPage, postQuantity, orderBy, tags)
 
-	postsList, err := h.services.GetPostByPage(postPage-1, postQuantity, isAdmin, idUser)
+	postsList, err := h.services.GetPostByPage(filter, postPage-1, postQuantity, isAdmin, idUser)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	fmt.Println(postsList)
 
 	c.JSON(http.StatusOK, postsList)
 

@@ -38,7 +38,7 @@ type Mail interface {
 type Post interface {
 	CreatePost(text string, tags []int, userId int) (int, error)
 	GetPostById(id int) (user.Post, error)
-	GetPostByPage(page int, items int, isAdmin bool, idUser int) ([]user.Post, error)
+	GetPostByPage(filter user.PostFilter, page int, items int, isAdmin bool, idUser int) ([]user.Post, error)
 	GetAllPosts(filter user.PostFilter, isAdmin bool, idUser int) ([]user.Post, error)
 	UpdatePost(id int, isModerated bool) error
 	DeletePost(id int) error
@@ -50,6 +50,7 @@ type Post interface {
 
 type Uploader interface {
 	Upload(id int, file []byte, size int64, contextType string) (string, error)
+	GetAvatar(id int) (string, error)
 	generateFileName() string
 }
 

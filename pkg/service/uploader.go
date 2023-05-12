@@ -32,6 +32,10 @@ func (s UploaderService) Upload(id int, file []byte, size int64, contextType str
 
 }
 
+func (s UploaderService) GetAvatar(id int) (string, error) {
+	return s.repo.GetAvatar(id)
+}
+
 func (s UploaderService) generateFileName() string {
 	b := make([]byte, fileNameLenght)
 	for i := range b {
