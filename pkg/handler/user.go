@@ -92,7 +92,7 @@ func (h *Handler) deleteUser(c *gin.Context) {
 }
 
 type Message struct {
-	Content string `json:"content" binding:"required"`
+	Code string `json:"code" binding:"required"`
 }
 
 func (h *Handler) checkActivationUser(c *gin.Context) {
@@ -105,7 +105,7 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 		return
 	}
 
-	verified, err := h.services.CheckCodeActivation(userId, code.Content)
+	verified, err := h.services.CheckCodeActivation(userId, code.Code)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -145,7 +145,7 @@ func (h *Handler) coincidenceSend(c *gin.Context) {
 		return
 	}
 
-	idCoincidence, err := h.services.RequestСorrespondence(idSender, input.Content)
+	idCoincidence, err := h.services.RequestСorrespondence(idSender, input.Code)
 	if idCoincidence == -1 {
 		c.JSON(http.StatusBadRequest, "Request exists")
 		return

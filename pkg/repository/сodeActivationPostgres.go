@@ -32,8 +32,8 @@ func (r *MailPostgres) SendCodeActivation(id int, rdmKey string) (string, error)
 }
 
 type CodeActivation struct {
-	codeActivation string
-	isVerificated  bool
+	CodeActivation string `db:"activation_code"`
+	IsVerificated  bool   `db:"is_verificated"`
 }
 
 func (r *MailPostgres) CheckCodeActivation(id int, rdmKey string) (bool, error) {
@@ -46,15 +46,15 @@ func (r *MailPostgres) CheckCodeActivation(id int, rdmKey string) (bool, error) 
 		return false, err
 	}
 
-	if cdActv.isVerificated == true {
+	if cdActv.IsVerificated == true {
 		err = errors.New("account already activated")
 		return true, err
 	}
 
-	verified = cdActv.codeActivation == rdmKey
+	verified = cdActv.CodeActivation == rdmKey
 
 	query2 := fmt.Sprintf("UPDATE %s SET is_verificated=$1 WHERE id=$2", userTable)
-	r.db.Get(&cdActv.codeActivation, query2, verified, id)
+	r.db.Get(&cdActv.CodeActivation, query2, verified, id)
 
 	return verified, err
 }

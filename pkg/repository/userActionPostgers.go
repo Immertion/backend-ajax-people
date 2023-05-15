@@ -32,7 +32,7 @@ func (r *UserActionPostgres) CreateUser(user user.User) (int, error) {
 func (r *UserActionPostgres) GetUser(id int) (user.User, error) {
 	var user user.User
 
-	query := fmt.Sprintf("SELECT firstname, lastname, mail, is_admin FROM %s WHERE id=$1", userTable)
+	query := fmt.Sprintf("SELECT id,firstname, lastname,mail,age,status_user, education_level,study_program_id,school_id,avatar_path FROM %s WHERE id=$1", userTable)
 	err := r.db.Get(&user, query, id)
 
 	return user, err
