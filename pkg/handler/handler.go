@@ -3,6 +3,7 @@ package handler
 import (
 	"backend_ajax-people/pkg/service"
 	"github.com/gin-gonic/gin"
+	"github.com/mandrigin/gin-spa/spa"
 )
 
 type Handler struct {
@@ -264,6 +265,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.PUT("/:id", h.updateUser)
 		}
 	}
+
+	router.Use(spa.Middleware("/", "./client/dist/fefu-meeting-service-frontend"))
 
 	return router
 }
